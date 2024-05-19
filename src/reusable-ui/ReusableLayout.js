@@ -22,7 +22,7 @@ import { observer } from "mobx-react";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { UserNav } from "./ReusableProfileMenu";
 import Image from "next/image";
-import logoImg from "../assets/1000todoslogo.png";
+import logoImg from "../assets/animelogo.png";
 
 import MobileHeader from "./MobileHeader";
 import {
@@ -113,56 +113,6 @@ const ReusableLayout = observer(({ children }) => {
           direction="horizontal"
           className="h-full max-h-[950px] items-stretch"
         >
-          <ResizablePanel
-            defaultSize={defaultLayout[0]}
-            maxSize={20}
-            className="max-w-[200px] min-w-[200px] h-[950px]"
-          >
-            <Link href="/" className="cursor-pointer">
-              <div className="flex h-[52px] items-center justify-center px-2">
-                <Image src={logoImg} width={32} height={32} alt="logo" />
-                <div className="text-2xl font-bold ml-1">1000 Todos</div>
-              </div>
-            </Link>
-            <Separator />
-            <VerticalNavbar
-              links={[
-                {
-                  title: "Todos",
-                  icon: LayoutDashboard,
-                  variant: isRoute("/"),
-                  href: "",
-                },
-                {
-                  title: "Progress",
-                  icon: Search,
-                  variant: isRoute("Explore"),
-                  href: "explore",
-                },
-                {
-                  title: "Inventory",
-                  icon: BookOpen,
-                  variant: isRoute("Learn"),
-                  href: "learn",
-                },
-              ]}
-            />
-            <Separator />
-            <div className="flex justify-center items-center w-[185px] m-2">
-              <CreateListDialog />
-            </div>
-
-            {lists.length > 0 && (
-              <VerticalNavbar
-                links={lists.map((list) => ({
-                  title: list.name,
-                  icon: ListMinus,
-                  variant: isRoute(list.id),
-                  href: `list/${list.id}`,
-                }))}
-              />
-            )}
-          </ResizablePanel>
           {/* <ResizableHandle /> */}
           <ResizablePanel
             className="border-l border-gray-[#e5e7eb]"
@@ -171,14 +121,18 @@ const ReusableLayout = observer(({ children }) => {
             style={{ overflow: "auto" }}
           >
             <div>
-              <div className="w-full h-[53px] flex justify-end items-center p-2 border-b  gap-4">
-                <Input
+              <div className="w-full h-[100px] flex justify-center items-center border-b  gap-4">
+                {/* <Input
                   // type="search"
                   placeholder="Search..."
                   className="md:w-[100px] lg:w-[300px]"
                   icon={<Search size={16} />}
-                />
-                {user ? (
+                /> */}
+
+                <Image src={logoImg} width={90} height={90} alt="logo" />
+                <div className="font-bold text-[40px]">ANIME LIKE THIS</div>
+
+                {/* {user ? (
                   <>
                     <ModeToggle />
                     <UserNav user={user} logout={logout} />
@@ -192,7 +146,7 @@ const ReusableLayout = observer(({ children }) => {
                       <Button>Create Free Account</Button>
                     </Link>
                   </div>
-                )}
+                )} */}
               </div>
               <div className="">{children}</div>
             </div>
