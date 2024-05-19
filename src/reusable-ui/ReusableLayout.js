@@ -131,6 +131,7 @@ const ReusableLayout = observer(({ children }) => {
 
                 <Image src={logoImg} width={90} height={90} alt="logo" />
                 <div className="font-bold text-[40px]">ANIME LIKE THIS</div>
+                <ModeToggle />
 
                 {/* {user ? (
                   <>

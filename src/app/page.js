@@ -58,8 +58,27 @@ const LineWithCircle = ({ number }) => {
   );
 };
 
+const splitByBr = (content) => {
+  return content.split("<br><br>").map((chunk, index) => (
+    <p key={index} className="flex mb-2">
+      <span className="mr-1">{index + 1}.</span> <Markdown>{chunk}</Markdown>
+    </p>
+  ));
+};
+
+const BlogContent = ({ content }) => {
+  return (
+    <div style={{ lineHeight: "29px" }} className="text-[18px] my-4">
+      {splitByBr(content)}
+    </div>
+  );
+};
+
 const AnimePage = observer(() => {
+  const { blogs } = MobxStore;
   const { title, id, creator, img, synopsis, date, recomendedAnimes } = anime;
+  console.log({ blogs });
+  if (!blogs.length) return <div>Loading...</div>;
   return (
     <div className="m-4 sm:mx-8">
       <section className="flex">
@@ -215,6 +234,14 @@ const AnimePage = observer(() => {
                       </p>
                     ))}
                   </div>
+
+                  <div>SIMILARITIES</div>
+                  <BlogContent content={blogs[0].similarities} />
+
+                  <div className="my-2"></div>
+
+                  <div>DIFFERENCES</div>
+                  <BlogContent content={blogs[0].differences} />
                 </div>
               );
             })}

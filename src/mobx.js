@@ -30,6 +30,7 @@ import {
 } from "firebase/firestore";
 
 import Logger from "@/utils/logger";
+import { IoMdReturnLeft } from "react-icons/io";
 
 const DEFAULT_USER = {
   level: 1,
@@ -44,6 +45,7 @@ class Store {
 
   todos = [];
   user = null;
+  blogs = [];
 
   // Static Data
 
@@ -73,10 +75,12 @@ class Store {
     this.editListName = this.editListName.bind(this);
 
     this.updateUser = this.updateUser.bind(this);
+    this.fetchBlogs = this.fetchBlogs.bind(this);
   }
 
   initializeAuth() {
     const auth = getAuth();
+    this.fetchBlogs();
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userDocRef = doc(db, "users", user.uid);
@@ -84,20 +88,9 @@ class Store {
 
         runInAction(() => {
           if (!userDoc.exists()) {
-            const newUser = {
-              ...DEFAULT_USER,
-              uid: user.uid,
-              provider: "anonymous",
-              username: "Guest",
-              createdAt: new Date(),
-            };
-            setDoc(userDocRef, newUser).then(() => {
-              this.user = newUser;
-            });
-          } else {
-            this.user = { uid: user.uid, ...userDoc.data() };
+            IoMdReturnLeft;
           }
-
+          this.user = { uid: user.uid, ...userDoc.data() };
           this.fetchLists();
         });
       } else {
@@ -109,6 +102,24 @@ class Store {
         this.loading = false;
       });
     });
+  }
+
+  async fetchBlogs() {
+    try {
+      const blogsRef = collection(db, "blogs");
+      const querySnapshot = await getDocs(blogsRef);
+
+      runInAction(() => {
+        this.blogs = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+      });
+
+      logger.debug("Blogs fetched successfully");
+    } catch (error) {
+      logger.debug("Error fetching blogs:", error);
+    }
   }
 
   //
