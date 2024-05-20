@@ -77,8 +77,9 @@ const BlogContent = ({ content }) => {
 const AnimePage = observer(() => {
   const { blogs } = MobxStore;
   const { title, id, creator, img, synopsis, date, recomendedAnimes } = anime;
-  console.log({ blogs });
+
   if (!blogs.length) return <div>Loading...</div>;
+
   return (
     <div className="m-4 sm:mx-8">
       <section className="flex">
@@ -236,12 +237,12 @@ const AnimePage = observer(() => {
                   </div>
 
                   <div>SIMILARITIES</div>
-                  <BlogContent content={blogs[0].similarities} />
+                  <BlogContent content={blogs[1].comparisons[0].similarities} />
 
                   <div className="my-2"></div>
 
                   <div>DIFFERENCES</div>
-                  <BlogContent content={blogs[0].differences} />
+                  <BlogContent content={blogs[1].comparisons[0].differences} />
                 </div>
               );
             })}

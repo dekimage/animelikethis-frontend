@@ -43,16 +43,20 @@ const logger = new Logger({ debugEnabled: false }); // switch to true to see con
 class Store {
   // App Data
 
-  todos = [];
   user = null;
   blogs = [];
+  blog = {
+    anime: "",
+    malId: "",
+    comparisons: [{ anime: "", malId: "", differences: "", similarities: "" }],
+  };
+  loading = true;
+  isEditing = false;
 
   // Static Data
 
-  lists = [];
   // App States
   isMobileOpen = false;
-  loading = true;
 
   constructor() {
     makeAutoObservable(this);
@@ -64,18 +68,18 @@ class Store {
     this.loginWithEmail = this.loginWithEmail.bind(this);
     this.signupWithEmail = this.signupWithEmail.bind(this);
 
-    // update this
-    this.addExerciseToList = this.addExerciseToList.bind(this);
-    this.removePathwayFromLists = this.removePathwayFromLists.bind(this);
-    this.removeFromList = this.removeFromList.bind(this);
-
-    this.addList = this.addList.bind(this);
-    this.fetchLists = this.fetchLists.bind(this);
-    this.deleteList = this.deleteList.bind(this);
-    this.editListName = this.editListName.bind(this);
+    this.fetchAnime = this.fetchAnime.bind(this);
 
     this.updateUser = this.updateUser.bind(this);
     this.fetchBlogs = this.fetchBlogs.bind(this);
+    this.saveBlog = this.saveBlog.bind(this);
+    this.deleteBlog = this.deleteBlog.bind(this);
+    this.setBlog = this.setBlog.bind(this);
+    this.resetBlog = this.resetBlog.bind(this);
+    this.addComparison = this.addComparison.bind(this);
+    this.removeComparison = this.removeComparison.bind(this);
+    this.updateComparison = this.updateComparison.bind(this);
+    this.updateBlogField = this.updateBlogField.bind(this);
   }
 
   initializeAuth() {
@@ -104,6 +108,29 @@ class Store {
     });
   }
 
+  async fetchAnime(id) {
+    try {
+      const response = await axios.get(
+        `https://api.myanimelist.net/v2/anime/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer YOUR_TOKEN`, // Replace YOUR_TOKEN with your actual token
+          },
+        }
+      );
+
+      runInAction(() => {
+        this.fetchedAnimes.push(response.data.data);
+        this.currentAnime = response.data.data;
+      });
+    } catch (error) {
+      console.error("Error fetching anime details:", error);
+      runInAction(() => {
+        this.animeDetails = {};
+      });
+    }
+  }
+
   async fetchBlogs() {
     try {
       const blogsRef = collection(db, "blogs");
@@ -122,195 +149,100 @@ class Store {
     }
   }
 
-  //
-  //
-  //
-  //
-  //
-  // LISTS
-  async fetchLists() {
+  //CMS
+  async fetchBlogs() {
+    this.loading = true;
     try {
-      const userListsRef = collection(db, `users/${this.user.uid}/myLists`);
-      const querySnapshot = await getDocs(userListsRef);
-
+      const querySnapshot = await getDocs(collection(db, "blogs"));
+      const blogs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       runInAction(() => {
-        this.lists = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        this.blogs = blogs;
+        this.loading = false;
       });
-
-      logger.debug("Lists fetched successfully");
     } catch (error) {
-      logger.debug("Error fetching lists:", error);
+      console.error("Error fetching blogs:", error);
+      runInAction(() => {
+        this.loading = false;
+      });
     }
   }
 
-  async addExerciseToList(listId, sessionId) {
-    console.log({ listId, sessionId });
+  async saveBlog(blog) {
     try {
-      // Reference to the specific user's list document in Firebase
-      const listRef = doc(db, `users/${this.user.uid}/myLists`, listId);
-
-      // Get the current list document
-      const listDoc = await getDoc(listRef);
-      if (!listDoc.exists()) {
-        throw new Error("List not found");
+      if (blog.id) {
+        const blogRef = doc(db, "blogs", blog.id);
+        await updateDoc(blogRef, blog);
+      } else {
+        await addDoc(collection(db, "blogs"), blog);
       }
-
-      const listData = listDoc.data();
-      const updatedSessions = listData.sessions
-        ? [...listData.sessions, sessionId]
-        : [sessionId];
-
-      // Update the list in Firebase
-      await updateDoc(listRef, {
-        sessions: updatedSessions,
-      });
-
-      // Update MobX store
-      runInAction(() => {
-        const list = this.lists.find((l) => l.id === listId);
-        if (list) {
-          list.sessions = updatedSessions;
-        } else {
-          // Handle the case where the list is not found in the store
-        }
-      });
+      this.fetchBlogs();
+      this.setEditing(false);
     } catch (error) {
-      console.error("Error adding pathway to list:", error);
-      // Handle any errors appropriately
+      console.error("Error saving blog:", error);
     }
   }
 
-  async removeFromList(listId, pathwayId) {
+  async deleteBlog(id) {
     try {
-      // Reference to the specific user's list document in Firebase
-      const listRef = doc(db, `users/${this.user.uid}/myLists`, listId);
-
-      // Get the current list document
-      const listDoc = await getDoc(listRef);
-      if (!listDoc.exists()) {
-        throw new Error("List not found");
-      }
-
-      const listData = listDoc.data();
-      const updatedPathways = listData.pathways.filter(
-        (id) => id !== pathwayId
-      );
-
-      // Update the list in Firebase
-      await updateDoc(listRef, {
-        pathways: updatedPathways,
-      });
-
-      // Update MobX store
-      runInAction(() => {
-        const list = this.lists.find((l) => l.id === listId);
-        if (list) {
-          list.pathways = updatedPathways;
-        } else {
-          // Handle the case where the list is not found in the store
-        }
-      });
+      await deleteDoc(doc(db, "blogs", id));
+      this.fetchBlogs();
     } catch (error) {
-      console.error("Error removing pathway from list:", error);
-      // Handle any errors appropriately
+      console.error("Error deleting blog:", error);
     }
   }
 
-  async addList(listName) {
-    try {
-      const userListsRef = collection(db, `users/${this.user.uid}/myLists`);
-
-      const docRef = await addDoc(userListsRef, { name: listName });
-
-      runInAction(() => {
-        this.lists.push({
-          id: docRef.id,
-
-          name: listName,
-        });
-      });
-    } catch (error) {
-      console.error("Error adding list:", error);
-      // Handle any errors appropriately
-    }
+  setBlog(blog) {
+    this.blog = {
+      ...blog,
+      comparisons:
+        blog.comparisons && blog.comparisons.length > 0
+          ? blog.comparisons
+          : [{ anime: "", malId: "", differences: "", similarities: "" }],
+    };
   }
 
-  async deleteList(listId) {
-    try {
-      const listRef = doc(db, `users/${this.user.uid}/myLists`, listId);
-      await deleteDoc(listRef);
-
-      runInAction(() => {
-        this.lists = this.lists.filter((list) => list.id !== listId);
-      });
-    } catch (error) {
-      console.error("Error deleting list:", error);
-      // Handle any errors appropriately
-    }
+  resetBlog() {
+    this.blog = {
+      anime: "",
+      malId: "",
+      comparisons: [
+        { anime: "", malId: "", differences: "", similarities: "" },
+      ],
+    };
   }
 
-  async editListName(listId, newName) {
-    try {
-      const listRef = doc(db, `users/${this.user.uid}/myLists`, listId);
-      await updateDoc(listRef, { name: newName });
+  addComparison() {
+    this.blog.comparisons.push({
+      anime: "",
+      malId: "",
+      differences: "",
+      similarities: "",
+    });
+  }
 
-      runInAction(() => {
-        const list = this.lists.find((l) => l.id === listId);
-        if (list) {
-          list.name = newName;
-        } else {
-          // Handle the case where the list is not found in the store
-        }
-      });
-    } catch (error) {
-      console.error("Error editing list name:", error);
-      // Handle any errors appropriately
-    }
+  removeComparison(index) {
+    this.blog.comparisons.splice(index, 1);
+  }
+
+  updateComparison(index, field, value) {
+    this.blog.comparisons[index][field] = value;
+  }
+
+  updateBlogField(field, value) {
+    this.blog[field] = value;
+  }
+
+  setEditing(value) {
+    this.isEditing = value;
   }
 
   // GLOBAL MOBX STATE
   setIsMobileOpen(isMobileOpen) {
     runInAction(() => {
       this.isMobileOpen = isMobileOpen;
-    });
-  }
-
-  removePathwayFromListsInStore(pathwayId) {
-    this.lists.forEach((list) => {
-      const index = list.pathways.indexOf(pathwayId);
-      if (index > -1) {
-        list.pathways.splice(index, 1);
-      }
-    });
-  }
-
-  async removePathwayFromLists(pathwayId) {
-    const listsRef = collection(db, `users/${this.user.uid}/myLists`);
-    const q = query(listsRef, where("pathways", "array-contains", pathwayId));
-
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(async (doc) => {
-      const listRef = doc.ref;
-      await updateDoc(listRef, {
-        pathways: firebase.firestore.FieldValue.arrayRemove(pathwayId),
-      });
-    });
-    runInAction(() => {
-      this.pathways = this.pathways.filter((p) => p.id !== pathwayId);
-      this.recentPathways = this.recentPathways.filter(
-        (p) => p.id !== pathwayId
-      );
-      this.topPlayedPathways = this.topPlayedPathways.filter(
-        (p) => p.id !== pathwayId
-      );
-      this.userPathways = this.userPathways.filter((p) => p.id !== pathwayId);
-
-      this.lists.forEach((list) => {
-        list.pathways = list.pathways.filter((id) => id !== pathwayId);
-      });
     });
   }
 

@@ -13,6 +13,8 @@ import MobxStore from "@/mobx";
 import { observer } from "mobx-react";
 import { VerticalNavbar } from "./VerticalNavbar";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import logoImg from "../assets/animelogo.png";
 
 const MobileHeader = observer(() => {
   const { isMobileOpen, setIsMobileOpen } = MobxStore;
@@ -27,8 +29,9 @@ const MobileHeader = observer(() => {
   };
 
   return (
-    <div className="flex justify-between items-center border-b relative h-[52px] z-10000 p-4">
-      <div className="font-bold">Story RPG</div>
+    <div className="flex justify-between items-center border-b relative h-[75px] z-10000 p-4">
+      <Image src={logoImg} alt="Anime Like This" width={80} height={80} />
+      {/* <div className="font-bold">Anime Like This</div> */}
       <Button onClick={toggleMenu} className="p-2">
         {isMobileOpen ? (
           <X className="h-6 w-6" />
@@ -38,9 +41,9 @@ const MobileHeader = observer(() => {
       </Button>
 
       {isMobileOpen && (
-        <div className="absolute top-[52px] left-0 w-full h-screen flex flex-col items-start p-4 bg-white">
+        <div className="absolute top-[75px] left-0 w-full h-screen flex flex-col items-start p-4 bg-white">
           {/* List of menu items */}
-          <VerticalNavbar
+          {/* <VerticalNavbar
             links={[
               {
                 title: "Dashboard",
@@ -78,7 +81,7 @@ const MobileHeader = observer(() => {
                 callBack: () => setIsMobileOpen(false),
               },
             ]}
-          />
+          /> */}
         </div>
       )}
     </div>

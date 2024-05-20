@@ -2,7 +2,7 @@ export const anime = {
   id: "1298132",
   title: "Best Anime To Watch If You Enjoyed Death Note",
   img: "https://static0.gamerantimages.com/wordpress/wp-content/uploads/2023/06/best-anime-like-death-note.jpg?q=70&fit=contain&w=1140&h=&dpr=1",
-  creator: "Mark Sammut",
+  creator: "Darko Nikodinovski",
   date: "2023-06-23",
   synopsis:
     "Death Note is a gripping psychological thriller manga series written by Tsugumi Ohba and illustrated by Takeshi Obata. The story revolves around Light Yagami, a high school student who stumbles upon a mysterious notebook known as the Death Note, dropped by a Shinigami (death god) named Ryuk. This notebook grants its user the power to kill anyone whose name they write in it, provided they have seen the person's face. Light, disillusioned with the state of the world, decides to use the Death Note to rid the world of criminals and create a utopia where he reigns as a god-like figure known as Kira. As he embarks on his crusade, the world is thrown into chaos and fear as the mysterious deaths of criminals catch the attention of law enforcement agencies worldwide. To stop Kira, the enigmatic and brilliant detective known only as L is brought in to crack the case. Thus begins a high-stakes battle of wits between Light and L, each trying to outsmart the other. As the tension escalates, the story delves deep into themes of justice, morality, and the human condition, exploring the consequences of absolute power and the lengths to which individuals will go to achieve their ideals. Death Note is renowned for its intricate plot, complex characters, and thought-provoking narrative, making it a compelling and enduring work in the realm of manga and anime",
