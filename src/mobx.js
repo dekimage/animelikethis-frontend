@@ -52,6 +52,7 @@ class Store {
     malId: "",
     comparisons: [{ anime: "", malId: "", differences: "", similarities: "" }],
   };
+  blogsLoading = true;
   loading = true;
   isEditing = false;
   comparisonDetails = [];
@@ -83,7 +84,7 @@ class Store {
     this.removeComparison = this.removeComparison.bind(this);
     this.updateComparison = this.updateComparison.bind(this);
     this.updateBlogField = this.updateBlogField.bind(this);
-
+    this.fetchAnimeDetails = this.fetchAnimeDetails.bind(this);
     this.fetchAnime = this.fetchAnime.bind(this);
   }
 
@@ -214,12 +215,12 @@ class Store {
       }));
       runInAction(() => {
         this.blogs = blogs;
-        this.loading = false;
+        this.blogsLoading = false;
       });
     } catch (error) {
       console.error("Error fetching blogs:", error);
       runInAction(() => {
-        this.loading = false;
+        this.blogsLoading = false;
       });
     }
   }

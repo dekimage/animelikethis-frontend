@@ -75,13 +75,21 @@ const BlogContent = ({ content }) => {
 };
 
 const AnimePage = observer(() => {
-  const { blogs } = MobxStore;
+  const { blogs, comparisonDetails, blogsLoading } = MobxStore;
   const { title, id, creator, img, synopsis, date, recomendedAnimes } = anime;
 
   console.log(blogs[1]);
   console.log({ comparisonDetails });
 
-  if (!blogs.length) return <div>Loading...</div>;
+  useEffect(() => {
+    if (!blogsLoading && blogs.length > 0 && blogs[1]?.comparisons) {
+      const malIds = blogs[1].comparisons.map((comparison) => comparison.malId);
+      MobxStore.fetchAnimeDetails(malIds);
+    }
+  }, [blogsLoading, blogs]);
+
+  if (blogsLoading) return <div>Loading blogs...</div>;
+  if (!blogs.length) return <div>No blogs available</div>;
 
   return (
     <div className="m-4 sm:mx-8">
