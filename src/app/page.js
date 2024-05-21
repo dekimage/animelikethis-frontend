@@ -78,6 +78,9 @@ const AnimePage = observer(() => {
   const { blogs } = MobxStore;
   const { title, id, creator, img, synopsis, date, recomendedAnimes } = anime;
 
+  console.log(blogs[1]);
+  console.log({ comparisonDetails });
+
   if (!blogs.length) return <div>Loading...</div>;
 
   return (
@@ -158,6 +161,10 @@ const AnimePage = observer(() => {
         </div>
       </section>
 
+      <div>
+        <Button onClick={() => MobxStore.fetchAnime(2904)}>FETCH API</Button>
+      </div>
+
       <section className="mt-24 flex">
         <div className=" w-[750px]">
           {/* bg-red-100 */}
@@ -170,14 +177,14 @@ const AnimePage = observer(() => {
                     {anime.name}
                   </div>
                   <div className="my-1 text-center text-lg text-gray-500 font-bold">
-                    {anime.english}
+                    {anime.title}
                   </div>
-                  <div className="my-4">
+                  <div className="my-4 flex justify-center items-center">
                     <Image
-                      src={anime.img}
+                      src={anime.main_picture.large}
                       alt={anime.name}
-                      width={750}
-                      height={750}
+                      width={550}
+                      height={550}
                     />
                   </div>
                   {/* MYANIME LIST BOX */}
@@ -186,7 +193,7 @@ const AnimePage = observer(() => {
                       <div className="text-md font-bold mr-2">Genres:</div>
                       <div className="flex gap-2">
                         {anime.genres.map((genre, i) => {
-                          return <Badge key={i}>{genre}</Badge>;
+                          return <Badge key={i}>{genre.name}</Badge>;
                         })}
                       </div>
                     </div>
@@ -195,19 +202,23 @@ const AnimePage = observer(() => {
                       <div className="flex my-2 border-b">
                         <div className="text-md font-bold w-1/2">Type:</div>
                         <div className="text-md w-1/2 text-gray-400">
-                          {anime.type}
+                          {anime.media_type == "tv"
+                            ? "Series"
+                            : anime.media_type}
                         </div>
                       </div>
                       <div className="flex my-2 border-b">
                         <div className="text-md font-bold w-1/2">Aired:</div>
                         <div className="text-md w-1/2 text-gray-400">
-                          {anime.aired}
+                          {anime.start_date} to {anime.end_date}
                         </div>
                       </div>
                       <div className="flex my-2 border-b">
                         <div className="text-md font-bold w-1/2">Studios:</div>
                         <div className="text-md w-1/2 text-gray-400">
-                          {anime.studios}
+                          {anime.studios.map((studio, i) => {
+                            return <span key={i}>{studio.name}</span>;
+                          })}
                         </div>
                       </div>
                       <div className="flex my-2">
@@ -215,9 +226,9 @@ const AnimePage = observer(() => {
                           MyAnimeList Score:
                         </div>
                         <div className="text-md w-1/2 text-gray-400 flex items-center gap-2">
-                          <StarRating score={anime.score / 2} />
+                          <StarRating score={anime.mean / 2} />
                           <div className="text-md w-1/2 text-gray-400">
-                            {anime.score}
+                            {anime.mean}
                           </div>
                         </div>
                       </div>
@@ -229,7 +240,7 @@ const AnimePage = observer(() => {
                     style={{ lineHeight: "29px" }}
                     className="text-[18px] my-4"
                   >
-                    {anime.synopsis.split("\n\n").map((paragraph, index) => (
+                    {anime.synopsis?.split("\n\n").map((paragraph, index) => (
                       <p key={index} className="mb-4">
                         {paragraph}
                       </p>
@@ -237,12 +248,14 @@ const AnimePage = observer(() => {
                   </div>
 
                   <div>SIMILARITIES</div>
-                  <BlogContent content={blogs[1].comparisons[0].similarities} />
+                  <BlogContent
+                    content={blogs[1].comparisons[0]?.similarities}
+                  />
 
                   <div className="my-2"></div>
 
                   <div>DIFFERENCES</div>
-                  <BlogContent content={blogs[1].comparisons[0].differences} />
+                  <BlogContent content={blogs[1].comparisons[0]?.differences} />
                 </div>
               );
             })}

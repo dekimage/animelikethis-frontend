@@ -9,6 +9,7 @@ const nextConfig = {
       "images.unsplash.com",
       "firebasestorage.googleapis.com",
       "static0.gamerantimages.com",
+      "cdn.myanimelist.net",
     ],
   },
 };

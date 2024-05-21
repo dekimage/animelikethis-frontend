@@ -29,6 +29,8 @@ import {
   limit,
 } from "firebase/firestore";
 
+import axios from "axios";
+
 import Logger from "@/utils/logger";
 import { IoMdReturnLeft } from "react-icons/io";
 
@@ -52,6 +54,7 @@ class Store {
   };
   loading = true;
   isEditing = false;
+  comparisonDetails = [];
 
   // Static Data
 
@@ -80,9 +83,11 @@ class Store {
     this.removeComparison = this.removeComparison.bind(this);
     this.updateComparison = this.updateComparison.bind(this);
     this.updateBlogField = this.updateBlogField.bind(this);
+
+    this.fetchAnime = this.fetchAnime.bind(this);
   }
 
-  initializeAuth() {
+  async initializeAuth() {
     const auth = getAuth();
     this.fetchBlogs();
     onAuthStateChanged(auth, async (user) => {
@@ -106,25 +111,74 @@ class Store {
         this.loading = false;
       });
     });
+
+    try {
+      const token = await this.getAccessToken();
+      runInAction(() => {
+        this.accessToken = token;
+      });
+    } catch (error) {
+      console.error("Error initializing access token:", error);
+    }
+  }
+
+  async fetchAnimeDetails(malIds) {
+    try {
+      const clientId = process.env.NEXT_PUBLIC_MAL_CLIENT_ID;
+      if (!clientId) {
+        throw new Error("Client ID is not available");
+      }
+
+      // Create an array of promises
+      const promises = malIds.map((id) =>
+        axios.get(
+          `https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,created_at,updated_at,media_type,status,genres,num_episodes,start_season,background,studios'`,
+          {
+            headers: {
+              "X-MAL-CLIENT-ID": process.env.NEXT_PUBLIC_MAL_CLIENT_ID,
+            },
+          }
+        )
+      );
+
+      // Wait for all promises to resolve
+      const results = await Promise.all(promises);
+
+      // Extract the data from the results
+      const comparisonDetails = results.map((result) => result.data);
+
+      // Store the results in the Mobx state
+      runInAction(() => {
+        this.comparisonDetails = comparisonDetails;
+      });
+
+      console.log("Comparison Details:", this.comparisonDetails);
+    } catch (error) {
+      console.error("Error fetching anime details:", error);
+      runInAction(() => {
+        this.comparisonDetails = [];
+      });
+    }
   }
 
   async fetchAnime(id) {
     try {
       const response = await axios.get(
-        `https://api.myanimelist.net/v2/anime/${id}`,
+        `https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,created_at,updated_at,media_type,status,genres,num_episodes,start_season,background,studios'`,
         {
           headers: {
-            Authorization: `Bearer YOUR_TOKEN`, // Replace YOUR_TOKEN with your actual token
+            "X-MAL-CLIENT-ID": process.env.NEXT_PUBLIC_MAL_CLIENT_ID,
           },
         }
       );
 
       runInAction(() => {
-        this.fetchedAnimes.push(response.data.data);
-        this.currentAnime = response.data.data;
+        //   this.fetchedAnimes.push(response.data.data);
+        //   this.currentAnime = response.data.data;
+        console.log(response.data.data);
       });
     } catch (error) {
-      console.error("Error fetching anime details:", error);
+      console.log("Error fetching anime details:", error);
       runInAction(() => {
         this.animeDetails = {};
       });

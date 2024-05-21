@@ -143,7 +143,7 @@ const CMSView = observer(() => {
               Edit: <span className="text-md">{MobxStore.blog.anime}</span>
             </h1>
             <Button
-              onClick={() => handleDelete(blog.id)}
+              onClick={() => handleDelete(MobxStore.blog.id)}
               className="bg-red-500 hover:bg-red-700 w-fit"
             >
               <Trash /> Delete
