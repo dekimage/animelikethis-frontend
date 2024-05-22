@@ -112,43 +112,28 @@ class Store {
         this.loading = false;
       });
     });
-
-    try {
-      const token = await this.getAccessToken();
-      runInAction(() => {
-        this.accessToken = token;
-      });
-    } catch (error) {
-      console.error("Error initializing access token:", error);
-    }
   }
 
   async fetchAnimeDetails(malIds) {
     try {
-      const clientId = process.env.NEXT_PUBLIC_MAL_CLIENT_ID;
-      if (!clientId) {
-        throw new Error("Client ID is not available");
-      }
-
-      // Create an array of promises
       const promises = malIds.map((id) =>
-        axios.get(
-          `https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,created_at,updated_at,media_type,status,genres,num_episodes,start_season,background,studios'`,
-          {
-            headers: {
-              "X-MAL-CLIENT-ID": process.env.NEXT_PUBLIC_MAL_CLIENT_ID,
-            },
+        fetch(`/api/anime/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
           }
-        )
+          return response.json();
+        })
       );
 
-      // Wait for all promises to resolve
       const results = await Promise.all(promises);
+      console.log({ results });
+      const comparisonDetails = results;
 
-      // Extract the data from the results
-      const comparisonDetails = results.map((result) => result.data);
-
-      // Store the results in the Mobx state
       runInAction(() => {
         this.comparisonDetails = comparisonDetails;
       });

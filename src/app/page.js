@@ -78,7 +78,6 @@ const AnimePage = observer(() => {
   const { blogs, comparisonDetails, blogsLoading } = MobxStore;
   const { title, id, creator, img, synopsis, date, recomendedAnimes } = anime;
 
-  console.log(blogs[1]);
   console.log({ comparisonDetails });
 
   useEffect(() => {
@@ -177,7 +176,7 @@ const AnimePage = observer(() => {
         <div className=" w-[750px]">
           {/* bg-red-100 */}
           <div>
-            {recomendedAnimes.map((anime, i) => {
+            {comparisonDetails.map((anime, i) => {
               return (
                 <div key={i} className="">
                   <LineWithCircle number={5} />
