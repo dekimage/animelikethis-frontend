@@ -44,9 +44,11 @@ const logger = new Logger({ debugEnabled: false }); // switch to true to see con
 
 class Store {
   // App Data
-
+  homeBlogs = [];
+  lastVisibleBlog = null;
   user = null;
   blogs = [];
+  nextPageToken = null;
   blog = {
     anime: "",
     malId: "",
@@ -72,8 +74,6 @@ class Store {
     this.loginWithEmail = this.loginWithEmail.bind(this);
     this.signupWithEmail = this.signupWithEmail.bind(this);
 
-    this.fetchAnime = this.fetchAnime.bind(this);
-
     this.updateUser = this.updateUser.bind(this);
     this.fetchBlogs = this.fetchBlogs.bind(this);
     this.saveBlog = this.saveBlog.bind(this);
@@ -84,8 +84,9 @@ class Store {
     this.removeComparison = this.removeComparison.bind(this);
     this.updateComparison = this.updateComparison.bind(this);
     this.updateBlogField = this.updateBlogField.bind(this);
-    this.fetchAnimeDetails = this.fetchAnimeDetails.bind(this);
-    this.fetchAnime = this.fetchAnime.bind(this);
+
+    this.fetchBlogsHome = this.fetchBlogsHome.bind(this);
+    this.fetchMoreBlogs = this.fetchMoreBlogs.bind(this);
   }
 
   async initializeAuth() {
@@ -114,78 +115,212 @@ class Store {
     });
   }
 
-  async fetchAnimeDetails(malIds) {
+  async extractMalIds() {
     try {
-      const promises = malIds.map((id) =>
-        fetch(`/api/anime/${id}`, {
+      const blogsSnapshot = await getDocs(collection(db, "blogs"));
+      const malIds = new Set(); // Using a Set to ensure unique IDs
+
+      // Extract malIds from blogs
+      blogsSnapshot.forEach((doc) => {
+        const blog = doc.data();
+        malIds.add(blog.malId);
+        if (blog.comparisons && Array.isArray(blog.comparisons)) {
+          blog.comparisons.forEach((comparison) => {
+            malIds.add(comparison.malId);
+          });
+        }
+      });
+
+      // Convert Set to Array
+      const malIdArray = Array.from(malIds);
+      console.log(`Extracted ${malIdArray.length} unique MAL IDs`);
+      console.log({ malIdArray });
+      return malIdArray;
+    } catch (error) {
+      console.error("Error extracting MAL IDs:", error);
+      return [];
+    }
+  }
+
+  async fetchAndSaveAnimeDetails(malIds) {
+    try {
+      // Fetch anime details for each malId from your Next.js API
+      const promises = malIds.map(async (malId) => {
+        const response = await fetch(`/api/anime/${malId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-        }).then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      });
+
+      const animeDetailsArray = await Promise.all(promises);
+
+      console.log({ animeDetailsArray });
+
+      // Save each anime detail to the 'animes' collection
+      for (const animeDetails of animeDetailsArray) {
+        if (animeDetails) {
+          const animeRef = doc(
+            collection(db, "animes"),
+            animeDetails.id.toString()
+          );
+          await setDoc(animeRef, animeDetails);
+        }
+      }
+      console.log("Successfully saved all anime details to Firestore");
+    } catch (error) {
+      console.error("Error fetching or saving anime details:", error);
+    }
+  }
+
+  async fetchBlogAndAnimeDetails(blogId) {
+    try {
+      // Fetch the blog document
+      const blogRef = doc(db, "blogs", blogId);
+      const blogDoc = await getDoc(blogRef);
+      if (!blogDoc.exists()) {
+        return null;
+      }
+
+      const blogData = { id: blogDoc.id, ...blogDoc.data() };
+      const malIds = new Set();
+
+      // Collect main malId and malIds from comparisons
+      malIds.add(blogData.malId);
+      if (blogData.comparisons && Array.isArray(blogData.comparisons)) {
+        blogData.comparisons.forEach((comparison) => {
+          malIds.add(comparison.malId);
+        });
+      }
+
+      // Fetch the anime details for each malId
+      const animeDetailsPromises = Array.from(malIds).map(async (malId) => {
+        const animeRef = doc(db, "animes", malId);
+        const animeDoc = await getDoc(animeRef);
+
+        return animeDoc.exists()
+          ? { id: animeDoc.id, ...animeDoc.data() }
+          : null;
+      });
+
+      const animeDetailsArray = await Promise.all(animeDetailsPromises);
+      const animeDetails = animeDetailsArray.filter(
+        (details) => details !== null
+      );
+
+      // Create a map of malId to animeDetails for easy lookup
+      const animeDetailsMap = {};
+      animeDetails.forEach((detail) => {
+        animeDetailsMap[detail.id] = detail;
+      });
+
+      // Attach anime details to main blog data
+      blogData.animeDetails = animeDetailsMap[blogData.malId];
+
+      // Attach anime details to each comparison
+      if (blogData.comparisons && Array.isArray(blogData.comparisons)) {
+        blogData.comparisons = blogData.comparisons.map((comparison) => {
+          return {
+            ...comparison,
+            animeDetails: animeDetailsMap[comparison.malId],
+          };
+        });
+      }
+
+      return blogData;
+    } catch (error) {
+      console.error("Error fetching blog and anime details:", error);
+      return null;
+    }
+  }
+
+  async fetchBlogsHome() {
+    this.blogsLoading = true;
+    try {
+      const blogsRef = collection(db, "blogs");
+      const q = query(blogsRef, orderBy("malId"), limit(10));
+      const blogsSnapshot = await getDocs(q);
+
+      const blogs = await Promise.all(
+        blogsSnapshot.docs.map(async (snapshot) => {
+          try {
+            const blog = { id: snapshot.id, ...snapshot.data() };
+
+            // Test log inside Promise.all
+            const animeRef = doc(db, "animes", blog.malId);
+            const animeDoc = await getDoc(animeRef);
+
+            if (animeDoc.exists()) {
+              blog.animeDetails = { id: animeDoc.id, ...animeDoc.data() };
+            }
+            return blog;
+          } catch (error) {
+            console.error("Error processing blog:", doc.id, error);
+            return null;
           }
-          return response.json();
         })
       );
 
-      const results = await Promise.all(promises);
-      console.log({ results });
-      const comparisonDetails = results;
-
       runInAction(() => {
-        this.comparisonDetails = comparisonDetails;
+        this.nextPageToken =
+          blogsSnapshot.docs.length > 0
+            ? blogsSnapshot.docs[blogsSnapshot.docs.length - 1].id // Store the last document ID
+            : null;
+        this.lastVisibleBlog =
+          blogsSnapshot.docs[blogsSnapshot.docs.length - 1];
+        this.homeBlogs = blogs.filter((blog) => blog !== null);
+        this.blogsLoading = false;
       });
 
-      console.log("Comparison Details:", this.comparisonDetails);
+      console.log("Fetched blogs with anime details:", this.homeBlogs);
     } catch (error) {
-      console.error("Error fetching anime details:", error);
       runInAction(() => {
-        this.comparisonDetails = [];
+        this.blogsLoading = false;
       });
+      console.error("Error fetching blogs:", error);
     }
   }
 
-  async fetchAnime(id) {
-    try {
-      const response = await axios.get(
-        `https://api.myanimelist.net/v2/anime/${id}?fields=id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,created_at,updated_at,media_type,status,genres,num_episodes,start_season,background,studios'`,
-        {
-          headers: {
-            "X-MAL-CLIENT-ID": process.env.NEXT_PUBLIC_MAL_CLIENT_ID,
-          },
-        }
-      );
+  async fetchMoreBlogs() {
+    if (!this.nextPageToken || this.blogsLoading) return; // Don't fetch if there's no next page or already loading
 
-      runInAction(() => {
-        //   this.fetchedAnimes.push(response.data.data);
-        //   this.currentAnime = response.data.data;
-        console.log(response.data.data);
-      });
-    } catch (error) {
-      console.log("Error fetching anime details:", error);
-      runInAction(() => {
-        this.animeDetails = {};
-      });
-    }
-  }
-
-  async fetchBlogs() {
+    this.blogsLoading = true;
     try {
       const blogsRef = collection(db, "blogs");
-      const querySnapshot = await getDocs(blogsRef);
+      const q = query(
+        blogsRef,
+        orderBy("malId"),
+        // startAfter(this.nextPageToken),
+        limit(10)
+      );
+      console.log({ q });
+      const blogsSnapshot = await getDocs(q);
+      const fetchedBlogs = [];
+
+      for (const snapshot of blogsSnapshot.docs) {
+        const blog = { id: snapshot.id, ...snapshot.data() };
+        // ... (fetch anime details for each blog) ...
+        fetchedBlogs.push(blog);
+      }
 
       runInAction(() => {
-        this.blogs = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        this.nextPageToken =
+          blogsSnapshot.docs.length > 0
+            ? blogsSnapshot.docs[blogsSnapshot.docs.length - 1].id
+            : null;
+        this.homeBlogs.push(...fetchedBlogs);
+        this.blogsLoading = false;
       });
-
-      logger.debug("Blogs fetched successfully");
     } catch (error) {
-      logger.debug("Error fetching blogs:", error);
+      runInAction(() => {
+        this.blogsLoading = false;
+      });
+      console.error("Error fetching more blogs:", error);
     }
   }
 
