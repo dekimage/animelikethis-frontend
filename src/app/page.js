@@ -5,6 +5,7 @@ import { ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import MobxStore from "@/mobx";
 import Link from "next/link";
+import { toJS } from "mobx";
 
 const AllBlogsPage = observer(() => {
   useEffect(() => {
@@ -15,7 +16,6 @@ const AllBlogsPage = observer(() => {
     MobxStore.fetchMoreBlogs();
   };
 
-  console.log({ blogs: MobxStore.homeBlogs });
   return (
     <div className="p-4">
       <div>
@@ -25,42 +25,31 @@ const AllBlogsPage = observer(() => {
           </h2>
         </div>
         <div className="flex flex-wrap gap-4">
-          {MobxStore.homeBlogs.map((blog) => (
-            <Link
-              href={`/recommendation/${blog.id}`}
-              key={blog.id}
-              className="p-4 mb-4 border rounded-lg flex flex-col gap-3
+          {MobxStore.homeBlogs.map((blog) => {
+            {
+              /* console.log({ blog: toJS(blog) }); */
+            }
+            return (
+              <Link
+                href={`/recommendation/${blog.id}`}
+                key={blog.id}
+                className="p-4 mb-4 w-[400px] border rounded-lg flex flex-col gap-3
               w-[250px]"
-            >
-              <div className="text-2xl font-bold">{blog.anime}</div>
-              <p className="font-bold text-sm">MAL ID: {blog.malId}</p>
-              <div>
-                <h3 className="text-lg font-bold">Anime Details</h3>
-                {blog.animeDetails ? (
-                  <div>
-                    <p>{blog.animeDetails.title}</p>
-                    <Image
-                      width={150}
-                      height={200}
-                      src={blog.animeDetails.main_picture.large}
-                      alt={blog.animeDetails.title}
-                    />
-                    <p>
-                      <strong>Score:</strong> {blog.animeDetails.mean}
-                    </p>
-                    <p>
-                      <strong>Genres:</strong>{" "}
-                      {blog.animeDetails.genres
-                        .map((genre) => genre.name)
-                        .join(", ")}
-                    </p>
-                  </div>
-                ) : (
-                  <p>No anime details available</p>
+              >
+                {blog.animeDetails && (
+                  <Image
+                    width={150}
+                    height={200}
+                    src={blog.animeDetails.main_picture.large}
+                    alt={blog.animeDetails.title}
+                  />
                 )}
-              </div>
-            </Link>
-          ))}
+                <div className="text-2xl font-bold hover:underline">
+                  5 Anime Like {blog.anime}
+                </div>
+              </Link>
+            );
+          })}
         </div>
         <div className="mt-4">
           {/* <button

@@ -90,29 +90,27 @@ class Store {
   }
 
   async initializeAuth() {
-    const auth = getAuth();
-    this.fetchBlogs();
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        runInAction(() => {
-          if (!userDoc.exists()) {
-            IoMdReturnLeft;
-          }
-          this.user = { uid: user.uid, ...userDoc.data() };
-          this.fetchLists();
-        });
-      } else {
-        runInAction(() => {
-          this.user = null;
-        });
-      }
-      runInAction(() => {
-        this.loading = false;
-      });
-    });
+    // const auth = getAuth();
+    // this.fetchBlogs();
+    // onAuthStateChanged(auth, async (user) => {
+    //   if (user) {
+    //     const userDocRef = doc(db, "users", user.uid);
+    //     const userDoc = await getDoc(userDocRef);
+    //     runInAction(() => {
+    //       if (!userDoc.exists()) {
+    //         IoMdReturnLeft;
+    //       }
+    //       this.user = { uid: user.uid, ...userDoc.data() };
+    //     });
+    //   } else {
+    //     runInAction(() => {
+    //       this.user = null;
+    //     });
+    //   }
+    //   runInAction(() => {
+    //     this.loading = false;
+    //   });
+    // });
   }
 
   async extractMalIds() {
@@ -277,7 +275,7 @@ class Store {
         this.blogsLoading = false;
       });
 
-      console.log("Fetched blogs with anime details:", this.homeBlogs);
+      // console.log("Fetched blogs with anime details:", this.homeBlogs);
     } catch (error) {
       runInAction(() => {
         this.blogsLoading = false;

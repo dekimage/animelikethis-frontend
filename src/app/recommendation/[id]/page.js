@@ -95,7 +95,7 @@ const AnimePage = observer(() => {
 
   return (
     <div className="m-4 sm:mx-8">
-      <section className="flex">
+      <section className="flex justify-center">
         <div className=" w-[750px]">
           {/* bg-red-100 */}
           <div className="text-[32px] font-bold uppercase mb-2 ">{name}</div>
@@ -105,10 +105,10 @@ const AnimePage = observer(() => {
             width={750}
             height={750}
           />
-          <Button onClick={() => fetchAndSaveAnimeDetails(["263"])}>
+          {/* <Button onClick={() => fetchAndSaveAnimeDetails(["263"])}>
             Fetch and Save Anime Details
           </Button>
-          <Button onClick={() => extractMalIds()}>extract ids</Button>
+          <Button onClick={() => extractMalIds()}>extract ids</Button> */}
           <div className="flex w-full items-center p-2 text-sm gap-4 justify-between">
             <div>
               <div>
@@ -180,11 +180,11 @@ const AnimePage = observer(() => {
         </div>
       </section>
 
-      <div>
+      {/* <div>
         <Button onClick={() => MobxStore.fetchAnime(2904)}>FETCH API</Button>
-      </div>
+      </div> */}
 
-      <section className="mt-24 flex">
+      <section className="mt-24 flex justify-center">
         <div className=" w-[750px]">
           {/* bg-red-100 */}
           <div>
