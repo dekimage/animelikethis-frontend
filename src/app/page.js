@@ -26,7 +26,7 @@ const AllBlogsPage = observer(() => {
             Blogs ({MobxStore.homeBlogs.length})
           </h2>
         </div>
-        <Button onClick={async () => await MobxStore.addBlogsBulk(blogsGPT)}>
+        {/* <Button onClick={async () => await MobxStore.addBlogsBulk(blogsGPT)}>
           Add blogs
         </Button>
         <Button
@@ -41,22 +41,15 @@ const AllBlogsPage = observer(() => {
         <Button
           onClick={() =>
             MobxStore.fetchAndSaveAnimeDetails([
-              "34537",
-              "7311",
-              "11597",
-              "36999",
-              "849",
-              "31240",
-              "584",
-              "5355",
-              "28249",
-              "34547",
-              28999,
+              // "4139",
+              // "41357",
+              // "23390",
+              // "28877",
             ])
           }
         >
           Fetch and Save Anime Details
-        </Button>
+        </Button> */}
         <div className="flex flex-wrap gap-4">
           {MobxStore.homeBlogs.map((blog) => {
             {

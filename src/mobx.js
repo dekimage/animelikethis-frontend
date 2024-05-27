@@ -144,7 +144,7 @@ class Store {
       );
       console.log(`Missing MAL IDs: ${missingMalIds.length}`);
 
-      return missingMalIds;
+      return missingMalIds.map((malId) => malId.toString());
     } catch (error) {
       console.error("Error finding missing MAL IDs:", error);
       return [];
@@ -334,9 +334,9 @@ class Store {
         blogsSnapshot.docs.map(async (snapshot) => {
           try {
             const blog = { id: snapshot.id, ...snapshot.data() };
-
+            console.log({ MALID: blog.malId });
             // Test log inside Promise.all
-            const animeRef = doc(db, "animes", blog.malId);
+            const animeRef = doc(db, "animes", blog.malId.toString());
             const animeDoc = await getDoc(animeRef);
 
             if (animeDoc.exists()) {
@@ -344,7 +344,7 @@ class Store {
             }
             return blog;
           } catch (error) {
-            console.error("Error processing blog:", doc.id, error);
+            console.log("Error processing blog:", doc.id, error);
             return null;
           }
         })

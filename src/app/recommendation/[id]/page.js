@@ -7,14 +7,25 @@ import { Button } from "@/components/ui/button";
 import { observer } from "mobx-react";
 import MobxStore from "@/mobx";
 
-import { Bookmark, ChevronRight, MessageCircle, Share } from "lucide-react";
-
+import {
+  Bookmark,
+  ChevronRight,
+  Facebook,
+  Flame,
+  MessageCircle,
+  Share,
+  Star,
+  Twitter,
+  Youtube,
+} from "lucide-react";
+import logoImg from "@/assets/animelogo.png";
 import Link from "next/link";
 import { anime } from "../../dummyData";
 import Image from "next/image";
 import StarRating from "@/components/customcomponents/StarRating";
 import Markdown from "react-markdown";
 import { useParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
 
 export const TitleDescription = ({ title, description, seeMore, button }) => {
   return (
@@ -50,7 +61,7 @@ const LineWithCircle = ({ number }) => {
 
 const splitByBr = (content) => {
   return content.split("<br><br>").map((chunk, index) => (
-    <p key={index} className="flex mb-2">
+    <p key={index} className="flex mb-4">
       <span className="mr-1">{index + 1}.</span> <Markdown>{chunk}</Markdown>
     </p>
   ));
@@ -58,7 +69,7 @@ const splitByBr = (content) => {
 
 const BlogContent = ({ content }) => {
   return (
-    <div style={{ lineHeight: "29px" }} className="text-[18px] my-4">
+    <div style={{ lineHeight: "29px" }} className="text-[18px] my-6">
       {splitByBr(content)}
     </div>
   );
@@ -95,16 +106,16 @@ const AnimePage = observer(() => {
   const { comparisons, name, animeDetails, anime } = data;
 
   return (
-    <div className="m-4 sm:mx-8">
-      <section className="flex justify-center">
-        <div className=" w-[750px]">
+    <div className="mx-2">
+      <section className="flex justify-center mt-12">
+        <div className=" w-[500px]">
           {/* bg-red-100 */}
-          <div className="text-[32px] font-bold uppercase mb-2 ">{name}</div>
+          <div className="text-[44px] font-bold uppercase mb-8">{name}</div>
           <Image
             src={animeDetails.main_picture.large}
             alt={anime}
-            width={750}
-            height={750}
+            width={500}
+            height={500}
           />
 
           {/* <Button onClick={() => extractMalIds()}>extract ids</Button> */}
@@ -131,7 +142,7 @@ const AnimePage = observer(() => {
           </div>
         </div>
 
-        <div className=" w-[300px] flex justify-center p-8 pr-0">
+        <div className=" w-[300px] justify-center p-8 pr-0 hidden sm:flex">
           {/* bg-yellow-100 */}
           <div className="flex gap-1 justify-center flex-col">
             <div className="flex items-center mb-6 gap-2">
@@ -184,31 +195,32 @@ const AnimePage = observer(() => {
       </div> */}
 
       <section className="mt-24 flex justify-center">
-        <div className=" w-[750px]">
+        <div className="w-[650px]">
           {/* bg-red-100 */}
           <div>
             {comparisons.map((comparison, i) => {
               const anime = comparison.animeDetails;
+              const viewAll = false;
               return (
                 <div key={i} className="">
-                  <LineWithCircle number={5} />
+                  <LineWithCircle number={comparisons.length - i} />
                   <div className="text-center text-[32px] font-bold mt-10">
                     {anime.name}
                   </div>
-                  <div className="my-1 text-center text-lg text-gray-500 font-bold">
+                  <div className="my-1 text-center text-4xl my-12 font-bold">
                     {anime.title}
                   </div>
                   <div className="my-4 flex justify-center items-center">
                     <Image
                       src={anime.main_picture.large}
                       alt={anime.name}
-                      width={550}
-                      height={550}
+                      width={500}
+                      height={500}
                     />
                   </div>
                   {/* MYANIME LIST BOX */}
-                  <div className="flex border p-2 rounded flex-col">
-                    <div className="flex my-2 border-b pb-2">
+                  <div className="flex border mt-12 rounded flex-col">
+                    <div className="flex border-b p-2 py-4 justify-between">
                       <div className="text-md font-bold mr-2">Genres:</div>
                       <div className="flex gap-2">
                         {anime.genres.map((genre, i) => {
@@ -219,32 +231,36 @@ const AnimePage = observer(() => {
 
                     <div className="flex flex-col">
                       <div className="flex my-2 border-b">
-                        <div className="text-md font-bold w-1/2">Type:</div>
-                        <div className="text-md w-1/2 text-gray-400">
+                        <div className="text-md font-bold w-1/2 p-2">Type:</div>
+                        <div className="text-md w-1/2 text-gray-400 pb-3">
                           {anime.media_type == "tv"
                             ? "Series"
                             : anime.media_type}
                         </div>
                       </div>
                       <div className="flex my-2 border-b">
-                        <div className="text-md font-bold w-1/2">Aired:</div>
-                        <div className="text-md w-1/2 text-gray-400">
+                        <div className="text-md font-bold w-1/2 p-2">
+                          Aired:
+                        </div>
+                        <div className="text-md w-1/2 text-gray-400 pb-3">
                           {anime.start_date} to {anime.end_date}
                         </div>
                       </div>
                       <div className="flex my-2 border-b">
-                        <div className="text-md font-bold w-1/2">Studios:</div>
-                        <div className="text-md w-1/2 text-gray-400">
+                        <div className="text-md font-bold w-1/2 p-2 pb-3">
+                          Studios:
+                        </div>
+                        <div className="text-md w-1/2 text-gray-400 pb-3">
                           {anime.studios.map((studio, i) => {
                             return <span key={i}>{studio.name}</span>;
                           })}
                         </div>
                       </div>
-                      <div className="flex my-2">
-                        <div className="text-md font-bold w-1/2">
+                      <div className="flex my-2 border-b">
+                        <div className="text-md font-bold w-1/2 p-2">
                           MyAnimeList Score:
                         </div>
-                        <div className="text-md w-1/2 text-gray-400 flex items-center gap-2">
+                        <div className="text-md w-1/2 text-gray-400 flex items-center gap-2 pb-3">
                           <StarRating score={anime.mean / 2} />
                           <div className="text-md w-1/2 text-gray-400">
                             {anime.mean}
@@ -252,37 +268,167 @@ const AnimePage = observer(() => {
                         </div>
                       </div>
                     </div>
+                    <div className="flex my-2">
+                      <div className="text-md font-bold w-1/2 p-2">
+                        Synopsis:
+                      </div>
+                      <div className="text-md w-1/2 text-gray-400 pb-3">
+                        {anime.synopsis
+                          ?.split("\n\n")
+                          .slice(0, 1)
+                          .map((paragraph, index) => (
+                            <p key={index} className="mb-4">
+                              {paragraph.slice(0, 200) + "..."}
+                            </p>
+                          ))}
+                      </div>
+                      {viewAll && (
+                        <div
+                          style={{ lineHeight: "29px" }}
+                          className="text-[18px] my-4"
+                        >
+                          {anime.synopsis
+                            ?.split("\n\n")
+                            .map((paragraph, index) => (
+                              <p key={index} className="mb-4">
+                                {paragraph}
+                              </p>
+                            ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* SYNOPSIS */}
-                  <div
-                    style={{ lineHeight: "29px" }}
-                    className="text-[18px] my-4"
-                  >
-                    {anime.synopsis?.split("\n\n").map((paragraph, index) => (
-                      <p key={index} className="mb-4">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
 
-                  <div>SIMILARITIES</div>
+                  <div className="text-4xl font-bold text-center my-12">
+                    TOP 5 SIMILARITIES
+                  </div>
                   <BlogContent content={comparison.similarities} />
 
-                  <div className="my-2"></div>
-
-                  <div>DIFFERENCES</div>
+                  <div className="text-4xl font-bold text-center my-12">
+                    TOP 5 DIFFERENCES
+                  </div>
                   <BlogContent content={comparison.differences} />
+                  <div className="mb-24"></div>
+                  <div className="mb-24 h-[200px] w-full border border-dashed flex justify-center items-center">
+                    AD PLACEMENT SMALL
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className="h-[2000px]  w-[300px] flex justify-center p-8 pr-0">
-          {/* bg-yellow-100 */}
-        </div>
+        {/* <div className="h-full w-full max-w-[400px] flex justify-center p-8 pr-0 bg-yellow-100 mx-8">
+          
+        </div> */}
       </section>
+      <div className="flex flex-col gap-4 justify-center mx-[5%]">
+        <div className="my-4 w-full flex gap-2 items-center">
+          <Flame /> <span className="text-2xl font-bold">RECOMMENDED</span>
+        </div>
+        <div className="flex flex-wrap gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="p-2 max-w-[450px]">
+              <div className="flex gap-2">
+                <Image
+                  src={animeDetails.main_picture.medium}
+                  alt={name}
+                  width={100}
+                  height={50}
+                  className="w-auto"
+                />
+                <div className="flex flex-col items-between justify-between h-[180px]">
+                  <div className="font-bold text-[24px] cursor-pointer h-[75px] tracking-tighter hover:underline">
+                    8 Best Manga to Read If You Love Oshi no Ko
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="text-sm">4 days ago</div>
+                    <div className="text-sm">2 comments</div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <div className="my-4 w-full flex gap-2 items-center">
+          <Star /> <span className="text-2xl font-bold">POPULAR</span>
+        </div>
+        <div className="flex flex-wrap gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="p-2 max-w-[450px]">
+              <div className="flex gap-2">
+                <Image
+                  src={animeDetails.main_picture.medium}
+                  alt={name}
+                  width={100}
+                  height={50}
+                  className="w-auto"
+                />
+                <div className="flex flex-col items-between justify-between h-[180px]">
+                  <div className="font-bold text-[24px] cursor-pointer h-[75px] tracking-tighter hover:underline">
+                    8 Best Manga to Read If You Love Oshi no Ko
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="text-sm">4 days ago</div>
+                    <div className="text-sm">2 comments</div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+      <div className="w-full flex justify-center items-center">
+        <div className="w-full my-12 px-4 flex justify-center items-center h-[200px] border max-w-[800px]">
+          AD PLACEMENT LARGE
+        </div>
+      </div>
+
+      {/* footer */}
+      <div className="bg-foreground text-background p-2 flex justify-center items-center flex-col">
+        <div className="flex justify-center items-center flex-col">
+          <Image src={logoImg} width={90} height={90} alt="logo" />
+          <div className="font-bold text-[20px]">ANIME LIKE THIS</div>
+        </div>
+        <div className="my-2">Copyright 2024 &copy;</div>
+
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          About us
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Contact
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Terms of Service
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Privacy Policy
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Ads Agreement
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Advertise with us
+        </Link>
+        <Link href="/about" className="text-lg my-1 hover:underline">
+          Our Audience
+        </Link>
+
+        <div className="flex gap-2">
+          <Link href="/facebook">
+            <Facebook />
+          </Link>
+          <Link href="/facebook">
+            <Twitter />
+          </Link>
+          <Link href="/facebook">
+            <Youtube />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 });
