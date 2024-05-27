@@ -73,6 +73,7 @@ const AnimePage = observer(() => {
     const fetchData = async () => {
       setLoading(true);
       const result = await MobxStore.fetchBlogAndAnimeDetails(id);
+      console.log({ result });
       setData(result);
       setLoading(false);
     };
@@ -105,10 +106,8 @@ const AnimePage = observer(() => {
             width={750}
             height={750}
           />
-          {/* <Button onClick={() => fetchAndSaveAnimeDetails(["263"])}>
-            Fetch and Save Anime Details
-          </Button>
-          <Button onClick={() => extractMalIds()}>extract ids</Button> */}
+
+          {/* <Button onClick={() => extractMalIds()}>extract ids</Button> */}
           <div className="flex w-full items-center p-2 text-sm gap-4 justify-between">
             <div>
               <div>

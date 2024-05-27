@@ -6,6 +6,8 @@ import Image from "next/image";
 import MobxStore from "@/mobx";
 import Link from "next/link";
 import { toJS } from "mobx";
+import { blogsGPT } from "./blogdata";
+import { Button } from "@/components/ui/button";
 
 const AllBlogsPage = observer(() => {
   useEffect(() => {
@@ -24,6 +26,37 @@ const AllBlogsPage = observer(() => {
             Blogs ({MobxStore.homeBlogs.length})
           </h2>
         </div>
+        <Button onClick={async () => await MobxStore.addBlogsBulk(blogsGPT)}>
+          Add blogs
+        </Button>
+        <Button
+          onClick={async () =>
+            await MobxStore.findMissingMalIds().then((missingMalIds) => {
+              console.log("Missing MAL IDs:", missingMalIds);
+            })
+          }
+        >
+          Find missing MAL IDs
+        </Button>
+        <Button
+          onClick={() =>
+            MobxStore.fetchAndSaveAnimeDetails([
+              "34537",
+              "7311",
+              "11597",
+              "36999",
+              "849",
+              "31240",
+              "584",
+              "5355",
+              "28249",
+              "34547",
+              28999,
+            ])
+          }
+        >
+          Fetch and Save Anime Details
+        </Button>
         <div className="flex flex-wrap gap-4">
           {MobxStore.homeBlogs.map((blog) => {
             {
