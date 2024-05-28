@@ -23,7 +23,7 @@ const AllBlogsPage = observer(() => {
       <div>
         <div className="">
           <h2 className="text-4xl font-bold mb-4">
-            Blogs ({MobxStore.homeBlogs.length})
+            Blogs ({MobxStore.homeBlogs?.length})
           </h2>
         </div>
         {/* <Button onClick={async () => await MobxStore.addBlogsBulk(blogsGPT)}>
@@ -69,8 +69,8 @@ const AllBlogsPage = observer(() => {
                   <Image
                     width={150}
                     height={200}
-                    src={blog.animeDetails.main_picture.large}
-                    alt={blog.animeDetails.title}
+                    src={blog.animeDetails?.main_picture?.large}
+                    alt={blog.animeDetails?.title}
                   />
                 )}
                 <div className="text-2xl font-bold hover:underline">

@@ -166,7 +166,7 @@ const AnimePage = async ({ params }) => {
             {/* bg-red-100 */}
             <div className="text-[44px] font-bold uppercase mb-8">{name}</div>
             <Image
-              src={animeDetails.main_picture.large}
+              src={animeDetails?.main_picture?.large}
               alt={anime}
               width={500}
               height={500}
@@ -207,7 +207,7 @@ const AnimePage = async ({ params }) => {
 
               <div className="flex gap-2 mb-4">
                 <Image
-                  src={animeDetails.main_picture.medium}
+                  src={animeDetails?.main_picture?.medium}
                   alt={name}
                   width={100}
                   height={50}
@@ -219,7 +219,7 @@ const AnimePage = async ({ params }) => {
               </div>
               <div className="flex gap-2 mb-4">
                 <Image
-                  src={animeDetails.main_picture.medium}
+                  src={animeDetails?.main_picture?.medium}
                   alt={name}
                   width={100}
                   height={50}
@@ -231,7 +231,7 @@ const AnimePage = async ({ params }) => {
               </div>
               <div className="flex gap-2 mb-4">
                 <Image
-                  src={animeDetails.main_picture.medium}
+                  src={animeDetails?.main_picture?.medium}
                   alt={name}
                   width={100}
                   height={50}
@@ -267,7 +267,7 @@ const AnimePage = async ({ params }) => {
                     </div>
                     <div className="my-4 flex justify-center items-center">
                       <Image
-                        src={anime?.main_picture.large}
+                        src={anime?.main_picture?.large}
                         alt={anime?.name}
                         width={500}
                         height={500}
@@ -308,7 +308,7 @@ const AnimePage = async ({ params }) => {
                             Studios:
                           </div>
                           <div className="text-md w-1/2 text-gray-400 pb-3">
-                            {anime?.studios.map((studio, i) => {
+                            {anime?.studios?.map((studio, i) => {
                               return <span key={i}>{studio.name}</span>;
                             })}
                           </div>
@@ -390,7 +390,7 @@ const AnimePage = async ({ params }) => {
               <Card key={i} className="p-2 max-w-[450px]">
                 <div className="flex gap-2">
                   <Image
-                    src={animeDetails.main_picture.medium}
+                    src={animeDetails?.main_picture?.medium}
                     alt={name}
                     width={100}
                     height={50}
@@ -418,7 +418,7 @@ const AnimePage = async ({ params }) => {
               <Card key={i} className="p-2 max-w-[450px]">
                 <div className="flex gap-2">
                   <Image
-                    src={animeDetails.main_picture.medium}
+                    src={animeDetails?.main_picture?.medium}
                     alt={name}
                     width={100}
                     height={50}
