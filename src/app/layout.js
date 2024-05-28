@@ -4,6 +4,7 @@ import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import ReusableLayout from "@/reusable-ui/ReusableLayout";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { AdSense } from "@/components/AdSense";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,7 +57,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <head></head>
+      <head>
+        <AdSense pid="ca-pub-3522825392018971" />
+      </head>
       <body className={brico.className}>
         <ThemeProvider attribute="class" defaultTheme="system">
           <ReusableLayout>{children}</ReusableLayout>
