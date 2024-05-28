@@ -252,15 +252,15 @@ const AnimePage = async ({ params }) => {
                   <div key={i} className="">
                     <LineWithCircle number={comparisons.length - i} />
                     <div className="text-center text-[32px] font-bold mt-10">
-                      {anime.name}
+                      {anime?.name}
                     </div>
                     <div className="my-1 text-center text-4xl my-12 font-bold">
-                      {anime.title}
+                      {anime?.title}
                     </div>
                     <div className="my-4 flex justify-center items-center">
                       <Image
-                        src={anime.main_picture.large}
-                        alt={anime.name}
+                        src={anime?.main_picture.large}
+                        alt={anime?.name}
                         width={500}
                         height={500}
                       />
@@ -270,8 +270,8 @@ const AnimePage = async ({ params }) => {
                       <div className="flex border-b p-2 py-4 justify-between">
                         <div className="text-md font-bold mr-2">Genres:</div>
                         <div className="flex gap-2">
-                          {anime.genres.map((genre, i) => {
-                            return <Badge key={i}>{genre.name}</Badge>;
+                          {anime?.genres?.map((genre, i) => {
+                            return <Badge key={i}>{genre?.name}</Badge>;
                           })}
                         </div>
                       </div>
@@ -282,9 +282,9 @@ const AnimePage = async ({ params }) => {
                             Type:
                           </div>
                           <div className="text-md w-1/2 text-gray-400 pb-3">
-                            {anime.media_type == "tv"
+                            {anime?.media_type == "tv"
                               ? "Series"
-                              : anime.media_type}
+                              : anime?.media_type}
                           </div>
                         </div>
                         <div className="flex my-2 border-b">
@@ -292,7 +292,7 @@ const AnimePage = async ({ params }) => {
                             Aired:
                           </div>
                           <div className="text-md w-1/2 text-gray-400 pb-3">
-                            {anime.start_date} to {anime.end_date}
+                            {anime?.start_date} to {anime?.end_date}
                           </div>
                         </div>
                         <div className="flex my-2 border-b">
@@ -300,7 +300,7 @@ const AnimePage = async ({ params }) => {
                             Studios:
                           </div>
                           <div className="text-md w-1/2 text-gray-400 pb-3">
-                            {anime.studios.map((studio, i) => {
+                            {anime?.studios.map((studio, i) => {
                               return <span key={i}>{studio.name}</span>;
                             })}
                           </div>
@@ -310,9 +310,9 @@ const AnimePage = async ({ params }) => {
                             MyAnimeList Score:
                           </div>
                           <div className="text-md w-1/2 text-gray-400 flex items-center gap-2 pb-3">
-                            <StarRating score={anime.mean / 2} />
+                            <StarRating score={anime?.mean / 2} />
                             <div className="text-md w-1/2 text-gray-400">
-                              {anime.mean}
+                              {anime?.mean}
                             </div>
                           </div>
                         </div>
@@ -322,7 +322,7 @@ const AnimePage = async ({ params }) => {
                           Synopsis:
                         </div>
                         <div className="text-md w-1/2 text-gray-400 pb-3">
-                          {anime.synopsis
+                          {anime?.synopsis
                             ?.split("\n\n")
                             .slice(0, 1)
                             .map((paragraph, index) => (
@@ -336,7 +336,7 @@ const AnimePage = async ({ params }) => {
                             style={{ lineHeight: "29px" }}
                             className="text-[18px] my-4"
                           >
-                            {anime.synopsis
+                            {anime?.synopsis
                               ?.split("\n\n")
                               .map((paragraph, index) => (
                                 <p key={index} className="mb-4">
