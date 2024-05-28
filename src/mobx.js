@@ -30,6 +30,7 @@ import {
 } from "firebase/firestore";
 
 import axios from "axios";
+import slugify from "slugify";
 
 import Logger from "@/utils/logger";
 import { IoMdReturnLeft } from "react-icons/io";
@@ -87,6 +88,9 @@ class Store {
 
     this.fetchBlogsHome = this.fetchBlogsHome.bind(this);
     this.fetchMoreBlogs = this.fetchMoreBlogs.bind(this);
+
+    this.generateExcerpt = this.generateExcerpt.bind(this);
+    this.updateDocuments = this.updateDocuments.bind(this);
   }
 
   async initializeAuth() {
@@ -111,6 +115,52 @@ class Store {
     //     this.loading = false;
     //   });
     // });
+  }
+
+  //script to enhance database with slugs and tags
+  generateExcerpt = (text, length = 150) => {
+    return text.length > length ? text.substring(0, length) + "..." : text;
+  };
+
+  async updateDocuments() {
+    try {
+      const blogsCollectionRef = collection(db, "blogs");
+      const blogsSnapshot = await getDocs(blogsCollectionRef);
+
+      const updatePromises = blogsSnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        if (!data.slug) {
+          const anime = data.anime || "Default Anime Title"; // Assuming 'anime' is the title field
+
+          const slug = `anime-like-${slugify(anime, {
+            lower: true,
+            strict: true,
+          })}`;
+
+          const excerpt =
+            data.comparisons && data.comparisons.length > 0
+              ? this.generateExcerpt(data.comparisons[0].differences)
+              : "Default excerpt";
+
+          const image = data.image || "default-image-url.jpg"; // Replace with logic to derive image URL
+
+          await updateDoc(doc.ref, {
+            slug,
+            // title: anime,
+            excerpt,
+            // image,
+          });
+          console.log(`Updated document ${doc.id} with slug: ${slug}`);
+        } else {
+          console.log(`Document ${doc.id} already has a slug. Skipping.`);
+        }
+      });
+
+      await Promise.all(updatePromises);
+      console.log("All documents have been processed.");
+    } catch (error) {
+      console.error("Error updating documents:", error);
+    }
   }
 
   async findMissingMalIds() {
@@ -334,7 +384,7 @@ class Store {
         blogsSnapshot.docs.map(async (snapshot) => {
           try {
             const blog = { id: snapshot.id, ...snapshot.data() };
-            console.log({ MALID: blog.malId });
+
             // Test log inside Promise.all
             const animeRef = doc(db, "animes", blog.malId.toString());
             const animeDoc = await getDoc(animeRef);

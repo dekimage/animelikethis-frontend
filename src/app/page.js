@@ -50,6 +50,9 @@ const AllBlogsPage = observer(() => {
         >
           Fetch and Save Anime Details
         </Button> */}
+        {/* <Button onClick={() => MobxStore.updateDocuments()}>
+          Add Slugs to all blogs
+        </Button> */}
         <div className="flex flex-wrap gap-4">
           {MobxStore.homeBlogs.map((blog) => {
             {
@@ -57,7 +60,7 @@ const AllBlogsPage = observer(() => {
             }
             return (
               <Link
-                href={`/recommendation/${blog.id}`}
+                href={`/${blog.slug}`}
                 key={blog.id}
                 className="p-4 mb-4 w-[400px] border rounded-lg flex flex-col gap-3
               w-[250px]"
