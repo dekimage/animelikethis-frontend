@@ -8,7 +8,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MobxStore from "@/mobx";
 import { observer } from "mobx-react";
 import { VerticalNavbar } from "./VerticalNavbar";

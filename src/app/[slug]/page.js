@@ -1,34 +1,20 @@
-// "use client";
 import { notFound } from "next/navigation";
 import React from "react";
-
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
-import { observer } from "mobx-react";
-import MobxStore from "@/mobx";
-
 import {
   Bookmark,
   ChevronRight,
-  Facebook,
   Flame,
   MessageCircle,
   Share,
   Star,
-  Twitter,
-  Youtube,
 } from "lucide-react";
-import logoImg from "@/assets/animelogo.png";
 import Link from "next/link";
-import { anime } from "../dummyData";
 import Image from "next/image";
 import StarRating from "@/components/customcomponents/StarRating";
 import Markdown from "react-markdown";
-import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import Head from "next/head";
-import { collection, query, getDocs, where, limit } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 import { fetchBlogAndAnimeDetails } from "../functions/fetchBlogAndAndAnimeDetails";
 
@@ -63,16 +49,21 @@ export async function generateMetadata({ params }) {
       "@id": `https://animelikethis.com/recommendation/${blogData.slug}`,
     },
     datePublished: blogData.createdAt
-      ? blogData.createdAt.toDate().toISOString()
+      ? blogData.createdAt?.toDate()?.toISOString()
       : "",
     dateModified: blogData.updatedAt
-      ? blogData.updatedAt.toDate().toISOString()
+      ? blogData.updatedAt?.toDate()?.toISOString()
       : "",
   };
 
   return {
-    title: `Anime Like ${blogData.anime} | Recommendations and Similar Shows`,
+    title: `${blogData.anime} | Anime Like This`,
     description: blogData.excerpt,
+    icons: {
+      icon: "/favicon.ico",
+      apple: "/apple-touch-icon.png",
+      shortcut: "/favicon.ico",
+    },
     openGraph: {
       type: "article",
       title: `Anime Like ${blogData.anime}`,
@@ -450,49 +441,6 @@ const AnimePage = async ({ params }) => {
         <div className="w-full flex justify-center items-center">
           <div className="w-full my-12 px-4 flex justify-center items-center h-[200px] border max-w-[800px]">
             AD PLACEMENT LARGE
-          </div>
-        </div>
-
-        {/* footer */}
-        <div className="bg-foreground text-background p-2 flex justify-center items-center flex-col">
-          <div className="flex justify-center items-center flex-col">
-            <Image src={logoImg} width={90} height={90} alt="logo" />
-            <div className="font-bold text-[20px]">ANIME LIKE THIS</div>
-          </div>
-          <div className="my-2">Copyright 2024 &copy;</div>
-
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            About us
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Contact
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Terms of Service
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Privacy Policy
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Ads Agreement
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Advertise with us
-          </Link>
-          <Link href="/about" className="text-lg my-1 hover:underline">
-            Our Audience
-          </Link>
-
-          <div className="flex gap-2">
-            <Link href="/facebook">
-              <Facebook />
-            </Link>
-            <Link href="/facebook">
-              <Twitter />
-            </Link>
-            <Link href="/facebook">
-              <Youtube />
-            </Link>
           </div>
         </div>
       </div>

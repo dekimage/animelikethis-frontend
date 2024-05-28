@@ -1,10 +1,8 @@
-// "use client";
 import { ThemeProvider } from "@/components/theme-provider";
 import "../globals.css";
 import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import ReusableLayout from "@/reusable-ui/ReusableLayout";
-// import { useState, useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,16 +11,48 @@ const brico = Bricolage_Grotesque({
   variable: "--font-brico",
 });
 
+export const metadata = {
+  metadataBase: new URL("https://animelikethis.com"),
+  keywords: [
+    "anime like",
+    "similar anime",
+    "anime similar to",
+    "anime like this",
+    "top 5 anime like",
+    "anime recommendations",
+    "anime suggestions",
+    "anime like my hero academia",
+    "anime like attack on titan",
+    "anime like naruto",
+    "anime like one piece",
+    "anime like demon slayer",
+    "anime like tokyo ghoul",
+    "anime like death note",
+    "anime like black clover",
+    "anime like hunter x hunter",
+    "anime like sword art online",
+    "anime like dragon ball z",
+    "anime like bleach",
+    "anime like solo leveling",
+  ],
+  title: "Anime Like This",
+  description:
+    "Get personalized anime recommendations based on what you already love. Discover new and exciting anime with Anime Like This!",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Anime Like This",
+    description:
+      "Get personalized anime recommendations based on what you already love. Discover new and exciting anime with Anime Like This!",
+    url: "https://animelikethis.com",
+    type: "website",
+  },
+};
+
 export default function RootLayout({ children }) {
-  // const [isClient, setIsClient] = useState(false);
-
-  // useEffect(() => {
-  //   setIsClient(true);
-  // }, []);
-
-  // if (!isClient) {
-  //   return null;
-  // }
   return (
     <html lang="en">
       <head></head>

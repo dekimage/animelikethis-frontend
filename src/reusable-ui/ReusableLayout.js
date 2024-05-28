@@ -1,111 +1,15 @@
 "use client";
-
 import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { Separator } from "@/components/ui/separator";
-import { VerticalNavbar } from "./VerticalNavbar";
-
-import {
-  BookOpen,
-  GaugeCircle,
-  LayoutDashboard,
-  ListMinus,
-  Plus,
-  Search,
-  SearchCheck,
-  UserIcon,
-} from "lucide-react";
-import MobxStore from "../mobx";
-import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { observer } from "mobx-react";
-import { LoadingSpinner } from "./LoadingSpinner";
-import { UserNav } from "./ReusableProfileMenu";
 import Image from "next/image";
 import logoImg from "../assets/animelogo.png";
-
 import MobileHeader from "./MobileHeader";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { ModeToggle } from "@/components/ui/themeButton";
+import { Footer } from "@/components/Footer";
+import Link from "next/link";
 
 const defaultLayout = [20, 80];
 
-const CreateListDialog = () => {
-  const [listName, setListName] = useState("");
-  const { addList } = MobxStore;
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
-          <Plus size={16} className="mr-2" /> Create List
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New List</DialogTitle>
-          <DialogDescription>
-            Store different pathways across custom lists.
-          </DialogDescription>
-        </DialogHeader>
-        <div>
-          <div className="space-y-4 py-2 pb-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">List Name</Label>
-              <Input
-                id="name"
-                placeholder="Morning Routine"
-                onChange={(e) => setListName(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setShowDialog(false)}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            onClick={() => {
-              // setShowDialog(false);
-              addList(listName);
-            }}
-          >
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const ReusableLayout = observer(({ children }) => {
-  const { user, lists, logout } = MobxStore;
-
-  const pathname = usePathname();
-  const isRoute = (route) => {
-    if (route === "/") {
-      return pathname.toLowerCase() === `/${route.toLowerCase()}`
-        ? "default"
-        : "ghost";
-    }
-
-    return pathname.toLowerCase().includes(route.toLowerCase())
-      ? "default"
-      : "ghost";
-  };
-
+const ReusableLayout = ({ children }) => {
   return (
     <div>
       <div className="hidden sm:block">
@@ -113,7 +17,6 @@ const ReusableLayout = observer(({ children }) => {
           direction="horizontal"
           className="h-full max-h-[950px] items-stretch"
         >
-          {/* <ResizableHandle /> */}
           <ResizablePanel
             className="border-l border-gray-[#e5e7eb]"
             defaultSize={defaultLayout[1]}
@@ -128,8 +31,9 @@ const ReusableLayout = observer(({ children }) => {
                   className="md:w-[100px] lg:w-[300px]"
                   icon={<Search size={16} />}
                 /> */}
-
-                <Image src={logoImg} width={90} height={90} alt="logo" />
+                <Link href="/">
+                  <Image src={logoImg} width={90} height={90} alt="logo" />
+                </Link>
                 <div className="font-bold text-[40px]">ANIME LIKE THIS</div>
                 <ModeToggle />
 
@@ -150,6 +54,7 @@ const ReusableLayout = observer(({ children }) => {
                 )} */}
               </div>
               <div className="">{children}</div>
+              <Footer />
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
@@ -157,9 +62,10 @@ const ReusableLayout = observer(({ children }) => {
       <div className="block sm:hidden">
         <MobileHeader />
         {children}
+        <Footer />
       </div>
     </div>
   );
-});
+};
 
 export default ReusableLayout;
