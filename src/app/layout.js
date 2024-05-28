@@ -3,6 +3,7 @@ import "../globals.css";
 import { Inter, Bricolage_Grotesque } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 import ReusableLayout from "@/reusable-ui/ReusableLayout";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -62,6 +63,7 @@ export default function RootLayout({ children }) {
           <Toaster />
         </ThemeProvider>
       </body>
+      <GoogleAnalytics gaId="G-LLXLLMG111" />
     </html>
   );
 }
