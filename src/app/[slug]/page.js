@@ -32,6 +32,75 @@ import { collection, query, getDocs, where, limit } from "firebase/firestore";
 import { db } from "@/firebase";
 import { fetchBlogAndAnimeDetails } from "../functions/fetchBlogAndAndAnimeDetails";
 
+export async function generateMetadata({ params }) {
+  const { slug } = params;
+  const blogData = await fetchBlogAndAnimeDetails(slug);
+
+  if (!blogData) {
+    return notFound();
+  }
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: `Anime Like ${blogData.anime}`,
+    description: blogData.excerpt,
+    image: blogData.image,
+    author: {
+      "@type": "Person",
+      name: "Your Name",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "anime Like This",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://animelikethis.com/logo.png",
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://animelikethis.com/recommendation/${blogData.slug}`,
+    },
+    datePublished: blogData.createdAt
+      ? blogData.createdAt.toDate().toISOString()
+      : "",
+    dateModified: blogData.updatedAt
+      ? blogData.updatedAt.toDate().toISOString()
+      : "",
+  };
+
+  return {
+    title: `Anime Like ${blogData.anime} | Recommendations and Similar Shows`,
+    description: blogData.excerpt,
+    openGraph: {
+      type: "article",
+      title: `Anime Like ${blogData.anime}`,
+      description: blogData.excerpt,
+      url: `https://animelikethis.com/${blogData.slug}`,
+      images: [
+        {
+          url: blogData.image,
+          alt: `Anime Like ${blogData.anime}`,
+        },
+      ],
+      site_name: "Anime Like This",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Anime Like ${blogData.anime}`,
+      description: blogData.excerpt,
+      images: [
+        {
+          url: blogData.image,
+          alt: `Anime Like ${blogData.anime}`,
+        },
+      ],
+    },
+    jsonLd: structuredData, // JSON-LD structured data
+  };
+}
+
 export async function generateStaticParams() {
   const blogsCollectionRef = collection(db, "blogs");
   const snapshot = await getDocs(blogsCollectionRef);
@@ -98,60 +167,8 @@ const AnimePage = async ({ params }) => {
 
   const { comparisons, name, animeDetails, anime } = blogData;
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: `Anime Like ${blogData.anime}`,
-    description: blogData.excerpt,
-    image: blogData.image,
-    author: {
-      "@type": "Person",
-      name: "Your Name",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Anime Like This",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://animelikethis.com/animelogo.png",
-      },
-    },
-    datePublished: blogData.publishDate, // Ensure you have this data
-    dateModified: blogData.updateDate, // Ensure you have this data
-  };
-
   return (
     <>
-      <Head>
-        <title>
-          Anime Like {blogData.anime} | Recommendations and Similar Shows
-        </title>
-        <meta name="description" content={blogData.excerpt} />
-        <meta property="og:title" content={`Anime Like ${blogData.anime}`} />
-        <meta property="og:description" content={blogData.excerpt} />
-        <meta property="og:image" content={blogData.image} />
-        <meta
-          property="og:url"
-          content={`https://animelikethis.com/${blogData.slug}`}
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`Anime Like ${blogData.anime}`} />
-        <meta name="twitter:description" content={blogData.excerpt} />
-        <meta name="twitter:image" content={blogData.image} />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={`Anime Like ${blogData.anime}`} />
-        <meta property="og:description" content={blogData.excerpt} />
-        <meta property="og:image" content={blogData.image} />
-        <meta
-          property="og:url"
-          content={`https://animelikethis.com/${blogData.slug}`}
-        />
-        <meta property="og:site_name" content="Animn Like This" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      </Head>
       <div className="mx-2">
         <section className="flex justify-center mt-12">
           <div className=" w-[500px]">
@@ -484,3 +501,36 @@ const AnimePage = async ({ params }) => {
 };
 
 export default AnimePage;
+
+{
+  /* <Head>
+        <title>
+          Anime Like {blogData.anime} | Recommendations and Similar Shows
+        </title>
+        <meta name="description" content={blogData.excerpt} />
+        <meta property="og:title" content={`Anime Like ${blogData.anime}`} />
+        <meta property="og:description" content={blogData.excerpt} />
+        <meta property="og:image" content={blogData.image} />
+        <meta
+          property="og:url"
+          content={`https://animelikethis.com/${blogData.slug}`}
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`Anime Like ${blogData.anime}`} />
+        <meta name="twitter:description" content={blogData.excerpt} />
+        <meta name="twitter:image" content={blogData.image} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={`Anime Like ${blogData.anime}`} />
+        <meta property="og:description" content={blogData.excerpt} />
+        <meta property="og:image" content={blogData.image} />
+        <meta
+          property="og:url"
+          content={`https://animelikethis.com/${blogData.slug}`}
+        />
+        <meta property="og:site_name" content="anime Like This" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </Head> */
+}

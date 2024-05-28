@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 
 export async function fetchBlogAndAnimeDetails(slug) {
-  console.log("Fetching blog and anime details for slug:", slug);
+  // console.log("Fetching blog and anime details for slug:", slug);
   try {
     // Fetch the blog document using the slug
     const blogsCollectionRef = collection(db, "blogs");
@@ -45,14 +45,14 @@ export async function fetchBlogAndAnimeDetails(slug) {
       });
     }
 
-    console.log("Collected malIds:", malIds);
+    // console.log("Collected malIds:", malIds);
 
     // Fetch the anime details for each malId
     const animeDetailsPromises = Array.from(malIds).map(async (malId) => {
       try {
         const animeRef = doc(db, "animes", malId);
         const animeDoc = await getDoc(animeRef);
-        console.log(`Fetched anime document for malId ${malId}:`, animeDoc);
+        // console.log(`Fetched anime document for malId ${malId}:`, animeDoc);
 
         return animeDoc.exists()
           ? { id: animeDoc.id, ...animeDoc.data() }
@@ -71,7 +71,7 @@ export async function fetchBlogAndAnimeDetails(slug) {
       (details) => details !== null
     );
 
-    console.log("Fetched anime details array:", animeDetails);
+    // console.log("Fetched anime details array:", animeDetails);
 
     // Create a map of malId to animeDetails for easy lookup
     const animeDetailsMap = {};
@@ -79,7 +79,7 @@ export async function fetchBlogAndAnimeDetails(slug) {
       animeDetailsMap[detail.id] = detail;
     });
 
-    console.log("Mapped anime details:", animeDetailsMap);
+    // console.log("Mapped anime details:", animeDetailsMap);
 
     // Attach anime details to main blog data
     blogData.animeDetails = animeDetailsMap[blogData.malId?.toString()];
@@ -94,7 +94,7 @@ export async function fetchBlogAndAnimeDetails(slug) {
       });
     }
 
-    console.log("Final blog data with anime details:", blogData);
+    // console.log("Final blog data with anime details:", blogData);
     return blogData;
   } catch (error) {
     console.error("Error fetching blog and anime details:", error);
@@ -102,20 +102,19 @@ export async function fetchBlogAndAnimeDetails(slug) {
   }
 }
 
-// export async function fetchBlogAndAnimeDetails(slug) {
-//   console.log("Fetching blog and anime details for slug:", slug);
+//   async fetchBlogAndAnimeDetails(blogId) {
+//   console.log("Fetching blog and anime details for blog ID:", blogId);
 //   try {
-//     // Fetch the blog document using the slug
-//     const blogsCollectionRef = collection(db, "blogs");
-//     const q = query(blogsCollectionRef, where("slug", "==", slug), limit(1));
-//     const querySnapshot = await getDocs(q);
+//     // Fetch the blog document
+//     const blogRef = doc(db, "blogs", blogId);
+//     const blogDoc = await getDoc(blogRef);
+//     console.log("Fetched blog document:", blogDoc);
 
-//     if (querySnapshot.empty) {
+//     if (!blogDoc.exists()) {
 //       console.log("Blog document does not exist.");
 //       return null;
 //     }
 
-//     const blogDoc = querySnapshot.docs[0];
 //     const blogData = { id: blogDoc.id, ...blogDoc.data() };
 //     const malIds = new Set();
 
