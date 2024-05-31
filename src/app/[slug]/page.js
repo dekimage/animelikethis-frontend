@@ -144,7 +144,7 @@ const splitByBr = (content) => {
 
 const BlogContent = ({ content }) => {
   return (
-    <div style={{ lineHeight: "29px" }} className="text-[18px] my-6">
+    <div style={{ lineHeight: "29px" }} className="text-[18px] my-6 mx-2 ml-4">
       {splitByBr(content)}
     </div>
   );
@@ -165,19 +165,21 @@ const AnimePage = async ({ params }) => {
   return (
     <>
       <div className="mx-2">
-        <section className="flex justify-center mt-12">
-          <div className=" w-[650px]">
+        <section className="mx-2 sm:mx-0 flex justify-center mt-12">
+          <div className="w-full sm:w-[650px] flex flex-col justify-center items-center">
             {/* bg-red-100 */}
-            <div className="text-[44px] font-bold uppercase mb-8">{name}</div>
+            <div className="text-[28px] sm:text-[44px] font-bold uppercase mb-8 text-center">
+              {name}
+            </div>
             <Image
               src={isList ? image : animeDetails?.main_picture?.large}
               alt={anime}
-              width={650}
-              height={650}
+              width={400}
+              height={400}
             />
 
             {/* <Button onClick={() => extractMalIds()}>extract ids</Button> */}
-            <div className="mt-16 flex w-full items-center p-2 text-sm gap-4 justify-between">
+            <div className="mt-8 flex w-full items-center p-2 text-sm gap-4 justify-between">
               <div>
                 <div>
                   By:{" "}
@@ -254,7 +256,7 @@ const AnimePage = async ({ params }) => {
       </div> */}
 
         <section className="mt-24 flex justify-center">
-          <div className="w-[650px]">
+          <div className="w-full sm:w-[650px]">
             <div>
               {comparisons.map((comparison, i) => {
                 const anime = comparison.animeDetails;
@@ -281,7 +283,7 @@ const AnimePage = async ({ params }) => {
                     <div className="flex border mt-12 rounded flex-col">
                       <div className="flex border-b p-2 py-4 justify-between">
                         <div className="text-md font-bold mr-2">Genres:</div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           {anime?.genres?.map((genre, i) => {
                             return <Badge key={i}>{genre?.name}</Badge>;
                           })}
@@ -392,7 +394,7 @@ const AnimePage = async ({ params }) => {
           
         </div> */}
         </section>
-        <div className="flex flex-col gap-4 justify-center mx-[5%]">
+        <div className="flex flex-col gap-4 justify-center">
           {/* <div className="my-4 w-full flex gap-2 items-center">
             <Flame /> <span className="text-2xl font-bold">RECOMMENDED</span>
           </div>
@@ -402,12 +404,14 @@ const AnimePage = async ({ params }) => {
             ))}
           </div> */}
 
-          <div className="my-4 w-full flex gap-2 items-center">
+          <div className="my-4 w-full flex gap-2 items-center justify-center">
             <Star /> <span className="text-2xl font-bold">POPULAR</span>
           </div>
-          <div className="flex flex-wrap gap-4">
-            {MobxStore.listsBlogs?.map((i) => (
-              <BlogCard key={i} blog={blogData} />
+          <div className="flex flex-wrap gap-4 justify-center">
+            {MobxStore.listsBlogs?.map((blog, i) => (
+              <Link href={`/${blog.slug}`} key={i}>
+                <BlogCard key={i} blog={blog} />
+              </Link>
             ))}
           </div>
         </div>

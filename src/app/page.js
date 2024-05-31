@@ -14,7 +14,7 @@ export const BlogCard = ({ blog }) => {
   const isList = blog.type == "list";
   if (isList) {
     return (
-      <Card className="max-w-[450px]">
+      <Card className="w-full sm:max-w-[450px]">
         <div className="flex flex-col gap-2">
           <Image
             src={blog.image}
@@ -53,12 +53,12 @@ export const BlogCard = ({ blog }) => {
           height={50}
           className="w-auto"
         />
-        <div className="flex flex-col items-between justify-between h-[180px]">
+        <div className="flex flex-col items-between justify-between min-h-[180px]">
           <div>
-            <div className="font-bold text-[24px] cursor-pointer h-[75px] tracking-tighter hover:underline">
+            <div className="font-bold text-[18px] sm:text-[24px] cursor-pointer min-h-[55px] tracking-tighter hover:underline">
               {isList ? `${blog.title}` : `5 Anime Like ${blog.anime}`}
             </div>
-            <div className="text-sm mt-2">{blog.excerpt?.slice(0, 70)}</div>
+            <div className="text-sm mt-2">{blog.excerpt?.slice(0, 70)}...</div>
           </div>
 
           <div className="flex justify-between">
@@ -77,13 +77,11 @@ const AllBlogsPage = observer(() => {
     fetchBlogsHome,
     fetchMoreBlogs,
     blogsLoading,
-    fetchListsBlogs,
     listsBlogs,
   } = MobxStore;
   useEffect(() => {
     if (!homeBlogs || homeBlogs.length === 0) {
       fetchBlogsHome();
-      // fetchListsBlogs();
     }
   }, []);
 

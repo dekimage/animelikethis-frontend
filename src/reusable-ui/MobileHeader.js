@@ -29,16 +29,17 @@ const MobileHeader = observer(() => {
   };
 
   return (
-    <div className="flex justify-between items-center border-b relative h-[75px] z-10000 p-4">
-      <Image src={logoImg} alt="Anime Like This" width={80} height={80} />
+    <div className="flex  items-center border-b relative justify-center h-[75px] z-10000 p-4">
+      <Image src={logoImg} alt="Anime Like This" width={65} height={65} />
       {/* <div className="font-bold">Anime Like This</div> */}
-      <Button onClick={toggleMenu} className="p-2">
+      {/* add this back when i have menu with lists */}
+      {/* <Button onClick={toggleMenu} className="p-2">
         {isMobileOpen ? (
           <X className="h-6 w-6" />
         ) : (
           <MenuIcon className="h-6 w-6" />
         )}
-      </Button>
+      </Button> */}
 
       {isMobileOpen && (
         <div className="absolute top-[75px] left-0 w-full h-screen flex flex-col items-start p-4 bg-white">
