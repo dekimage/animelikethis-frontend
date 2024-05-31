@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { auth, db } from "./firebase";
+import { auth, db, storage } from "./firebase";
 import {
   onAuthStateChanged,
   signInAnonymously,
@@ -27,13 +27,14 @@ import {
   where,
   orderBy,
   limit,
+  startAfter,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import axios from "axios";
 import slugify from "slugify";
 
 import Logger from "@/utils/logger";
-import { IoMdReturnLeft } from "react-icons/io";
 
 const DEFAULT_USER = {
   level: 1,
@@ -50,11 +51,27 @@ class Store {
   user = null;
   blogs = [];
   nextPageToken = null;
+  // blog = {
+  //   anime: "",
+  //   malId: "",
+  //   comparisons: [{ anime: "", malId: "", differences: "", similarities: "" }],
+  // };
   blog = {
-    anime: "",
+    title: "",
     malId: "",
-    comparisons: [{ anime: "", malId: "", differences: "", similarities: "" }],
+    anime: "",
+    type: "comparisons",
+    comparisons: [
+      {
+        anime: "",
+        malId: "",
+        differences: "",
+        similarities: "",
+        content: "",
+      },
+    ],
   };
+
   blogsLoading = true;
   loading = true;
   isEditing = false;
@@ -91,6 +108,7 @@ class Store {
 
     this.generateExcerpt = this.generateExcerpt.bind(this);
     this.updateDocuments = this.updateDocuments.bind(this);
+    this.fetchBlogById = this.fetchBlogById.bind(this);
   }
 
   async initializeAuth() {
@@ -324,6 +342,7 @@ class Store {
           blogsSnapshot.docs.length > 0
             ? blogsSnapshot.docs[blogsSnapshot.docs.length - 1].id // Store the last document ID
             : null;
+
         this.lastVisibleBlog =
           blogsSnapshot.docs[blogsSnapshot.docs.length - 1];
         this.homeBlogs = blogs.filter((blog) => blog !== null);
@@ -340,36 +359,48 @@ class Store {
   }
 
   async fetchMoreBlogs() {
-    if (!this.nextPageToken || this.blogsLoading) return; // Don't fetch if there's no next page or already loading
-
+    if (!this.lastVisibleBlog || this.blogsLoading) return; // Don't fetch if there's no next page or already loading
+    console.log(123, this.lastVisibleBlog);
     this.blogsLoading = true;
     try {
       const blogsRef = collection(db, "blogs");
       const q = query(
         blogsRef,
         orderBy("malId"),
-        // startAfter(this.nextPageToken),
+        startAfter(this.lastVisibleBlog), // Use the last visible document to start the next query
         limit(10)
       );
       console.log({ q });
       const blogsSnapshot = await getDocs(q);
-      const fetchedBlogs = [];
+      console.log({ blogsSnapshot });
 
-      for (const snapshot of blogsSnapshot.docs) {
-        const blog = { id: snapshot.id, ...snapshot.data() };
-        // ... (fetch anime details for each blog) ...
-        fetchedBlogs.push(blog);
-      }
+      const fetchedBlogs = await Promise.all(
+        blogsSnapshot.docs.map(async (snapshot) => {
+          const blog = { id: snapshot.id, ...snapshot.data() };
+
+          // Fetch anime details for each blog
+          const animeRef = doc(db, "animes", blog.malId.toString());
+          const animeDoc = await getDoc(animeRef);
+          if (animeDoc.exists()) {
+            blog.animeDetails = { id: animeDoc.id, ...animeDoc.data() };
+          }
+
+          return blog;
+        })
+      );
 
       runInAction(() => {
+        this.lastVisibleBlog =
+          blogsSnapshot.docs[blogsSnapshot.docs.length - 1]; // Update the last visible document
         this.nextPageToken =
           blogsSnapshot.docs.length > 0
             ? blogsSnapshot.docs[blogsSnapshot.docs.length - 1].id
             : null;
-        this.homeBlogs.push(...fetchedBlogs);
+        this.homeBlogs.push(...fetchedBlogs); // Append new blogs to the existing list
         this.blogsLoading = false;
       });
     } catch (error) {
+      console.log({ error });
       runInAction(() => {
         this.blogsLoading = false;
       });
@@ -398,15 +429,62 @@ class Store {
     }
   }
 
-  async saveBlog(blog) {
+  async uploadImage(file) {
+    if (!file) return null;
+
     try {
-      if (blog.id) {
-        const blogRef = doc(db, "blogs", blog.id);
-        await updateDoc(blogRef, blog);
-      } else {
-        await addDoc(collection(db, "blogs"), blog);
+      const storageRef = ref(storage, `images/${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      return url;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  }
+
+  async fetchBlogById(id) {
+    try {
+      const blogRef = doc(db, "blogs", id);
+      const blogDoc = await getDoc(blogRef);
+      if (blogDoc.exists()) {
+        const blog = { id: blogDoc.id, ...blogDoc.data() };
+        runInAction(() => {
+          const index = this.blogs.findIndex((b) => b.id === id);
+          if (index !== -1) {
+            this.blogs[index] = blog;
+          } else {
+            this.blogs.push(blog);
+          }
+        });
       }
-      this.fetchBlogs();
+    } catch (error) {
+      console.error("Error fetching blog by ID:", error);
+    }
+  }
+
+  async saveBlog(blog, file) {
+    try {
+      let imageUrl = blog.image || "";
+
+      if (file) {
+        imageUrl = await this.uploadImage(file);
+        if (!imageUrl) {
+          console.log("Failed to upload image");
+        }
+      }
+
+      const updatedBlog = { ...blog, image: imageUrl };
+
+      if (updatedBlog.id) {
+        const blogRef = doc(db, "blogs", updatedBlog.id);
+        await updateDoc(blogRef, updatedBlog);
+      } else {
+        const blogRef = await addDoc(collection(db, "blogs"), updatedBlog);
+        updatedBlog.id = blogRef.id;
+      }
+
+      await this.fetchBlogById(updatedBlog.id);
       this.setEditing(false);
     } catch (error) {
       console.error("Error saving blog:", error);
@@ -443,12 +521,11 @@ class Store {
   }
 
   addComparison() {
-    this.blog.comparisons.push({
-      anime: "",
-      malId: "",
-      differences: "",
-      similarities: "",
-    });
+    const newComparison =
+      this.blog.type === "comparisons"
+        ? { anime: "", malId: "", differences: "", similarities: "" }
+        : { anime: "", malId: "", content: "" };
+    this.blog.comparisons.push(newComparison);
   }
 
   removeComparison(index) {

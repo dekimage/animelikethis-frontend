@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 import { fetchBlogAndAnimeDetails } from "../functions/fetchBlogAndAndAnimeDetails";
+import { BlogCard } from "../page";
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
@@ -387,26 +388,7 @@ const AnimePage = async ({ params }) => {
           </div>
           <div className="flex flex-wrap gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="p-2 max-w-[450px]">
-                <div className="flex gap-2">
-                  <Image
-                    src={animeDetails?.main_picture?.medium}
-                    alt={name}
-                    width={100}
-                    height={50}
-                    className="w-auto"
-                  />
-                  <div className="flex flex-col items-between justify-between h-[180px]">
-                    <div className="font-bold text-[24px] cursor-pointer h-[75px] tracking-tighter hover:underline">
-                      8 Best Manga to Read If You Love Oshi no Ko
-                    </div>
-                    <div className="flex justify-between">
-                      <div className="text-sm">4 days ago</div>
-                      <div className="text-sm">2 comments</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <BlogCard key={i} blog={blogData} />
             ))}
           </div>
 
@@ -415,26 +397,7 @@ const AnimePage = async ({ params }) => {
           </div>
           <div className="flex flex-wrap gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="p-2 max-w-[450px]">
-                <div className="flex gap-2">
-                  <Image
-                    src={animeDetails?.main_picture?.medium}
-                    alt={name}
-                    width={100}
-                    height={50}
-                    className="w-auto"
-                  />
-                  <div className="flex flex-col items-between justify-between h-[180px]">
-                    <div className="font-bold text-[24px] cursor-pointer h-[75px] tracking-tighter hover:underline">
-                      8 Best Manga to Read If You Love Oshi no Ko
-                    </div>
-                    <div className="flex justify-between">
-                      <div className="text-sm">4 days ago</div>
-                      <div className="text-sm">2 comments</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <BlogCard key={i} blog={blogData} />
             ))}
           </div>
         </div>
