@@ -46,7 +46,9 @@ const logger = new Logger({ debugEnabled: false }); // switch to true to see con
 
 class Store {
   // App Data
+  blogsListLoading = false;
   homeBlogs = [];
+  listsBlogs = [];
   lastVisibleBlog = null;
   user = null;
   blogs = [];
@@ -109,6 +111,7 @@ class Store {
     this.generateExcerpt = this.generateExcerpt.bind(this);
     this.updateDocuments = this.updateDocuments.bind(this);
     this.fetchBlogById = this.fetchBlogById.bind(this);
+    this.fetchListsBlogs = this.fetchListsBlogs.bind(this);
   }
 
   async initializeAuth() {
@@ -133,6 +136,7 @@ class Store {
     //     this.loading = false;
     //   });
     // });
+    this.fetchListsBlogs();
   }
 
   //script to enhance database with slugs and tags
@@ -307,6 +311,31 @@ class Store {
       console.log("Successfully saved all anime details to Firestore");
     } catch (error) {
       console.error("Error fetching or saving anime details:", error);
+    }
+  }
+  async fetchListsBlogs() {
+    this.blogsListLoading = true;
+    try {
+      const blogsRef = collection(db, "blogs");
+      const q = query(blogsRef, where("type", "==", "list"), limit(10));
+      const blogsSnapshot = await getDocs(q);
+
+      const blogs = blogsSnapshot.docs.map((snapshot) => ({
+        id: snapshot.id,
+        ...snapshot.data(),
+      }));
+
+      runInAction(() => {
+        this.listsBlogs = blogs;
+        this.blogsListLoading = false;
+      });
+
+      console.log("Fetched blogs:", this.listsBlogs);
+    } catch (error) {
+      runInAction(() => {
+        this.blogsListLoading = false;
+      });
+      console.error("Error fetching list blogs:", error);
     }
   }
 

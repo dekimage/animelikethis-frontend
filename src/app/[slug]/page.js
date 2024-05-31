@@ -18,6 +18,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 import { fetchBlogAndAnimeDetails } from "../functions/fetchBlogAndAndAnimeDetails";
 import { BlogCard } from "../page";
+import MobxStore from "@/mobx";
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
@@ -157,24 +158,26 @@ const AnimePage = async ({ params }) => {
     notFound();
   }
 
-  const { comparisons, name, animeDetails, anime } = blogData;
+  const { comparisons, name, animeDetails, anime, image } = blogData;
+
+  const isList = blogData?.type === "list";
 
   return (
     <>
       <div className="mx-2">
         <section className="flex justify-center mt-12">
-          <div className=" w-[500px]">
+          <div className=" w-[650px]">
             {/* bg-red-100 */}
             <div className="text-[44px] font-bold uppercase mb-8">{name}</div>
             <Image
-              src={animeDetails?.main_picture?.large}
+              src={isList ? image : animeDetails?.main_picture?.large}
               alt={anime}
-              width={500}
-              height={500}
+              width={650}
+              height={650}
             />
 
             {/* <Button onClick={() => extractMalIds()}>extract ids</Button> */}
-            <div className="flex w-full items-center p-2 text-sm gap-4 justify-between">
+            <div className="mt-16 flex w-full items-center p-2 text-sm gap-4 justify-between">
               <div>
                 <div>
                   By:{" "}
@@ -198,8 +201,8 @@ const AnimePage = async ({ params }) => {
             </div>
           </div>
 
-          <div className=" w-[300px] justify-center p-8 pr-0 hidden sm:flex">
-            {/* bg-yellow-100 */}
+          {/* <div className=" w-[300px] justify-center p-8 pr-0 hidden sm:flex">
+     
             <div className="flex gap-1 justify-center flex-col">
               <div className="flex items-center mb-6 gap-2">
                 <div className="bg-primary w-[18px] h-[18px] rounded"></div>
@@ -243,7 +246,7 @@ const AnimePage = async ({ params }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </section>
 
         {/* <div>
@@ -252,11 +255,11 @@ const AnimePage = async ({ params }) => {
 
         <section className="mt-24 flex justify-center">
           <div className="w-[650px]">
-            {/* bg-red-100 */}
             <div>
               {comparisons.map((comparison, i) => {
                 const anime = comparison.animeDetails;
                 const viewAll = false;
+
                 return (
                   <div key={i} className="">
                     <LineWithCircle number={comparisons.length - i} />
@@ -357,17 +360,24 @@ const AnimePage = async ({ params }) => {
                       </div>
                     </div>
 
-                    {/* SYNOPSIS */}
+                    {isList ? (
+                      <div>
+                        <BlogContent content={comparison.content} />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-4xl font-bold text-center my-12">
+                          TOP 5 SIMILARITIES
+                        </div>
+                        <BlogContent content={comparison.similarities} />
 
-                    <div className="text-4xl font-bold text-center my-12">
-                      TOP 5 SIMILARITIES
-                    </div>
-                    <BlogContent content={comparison.similarities} />
+                        <div className="text-4xl font-bold text-center my-12">
+                          TOP 5 DIFFERENCES
+                        </div>
+                        <BlogContent content={comparison.differences} />
+                      </>
+                    )}
 
-                    <div className="text-4xl font-bold text-center my-12">
-                      TOP 5 DIFFERENCES
-                    </div>
-                    <BlogContent content={comparison.differences} />
                     <div className="mb-24"></div>
                     <div className="mb-24 h-[200px] w-full border border-dashed flex justify-center items-center">
                       AD PLACEMENT SMALL
@@ -383,20 +393,20 @@ const AnimePage = async ({ params }) => {
         </div> */}
         </section>
         <div className="flex flex-col gap-4 justify-center mx-[5%]">
-          <div className="my-4 w-full flex gap-2 items-center">
+          {/* <div className="my-4 w-full flex gap-2 items-center">
             <Flame /> <span className="text-2xl font-bold">RECOMMENDED</span>
           </div>
           <div className="flex flex-wrap gap-4">
-            {[1, 2, 3, 4].map((i) => (
+            {MobxStore.listsBlogs?.map((i) => (
               <BlogCard key={i} blog={blogData} />
             ))}
-          </div>
+          </div> */}
 
           <div className="my-4 w-full flex gap-2 items-center">
             <Star /> <span className="text-2xl font-bold">POPULAR</span>
           </div>
           <div className="flex flex-wrap gap-4">
-            {[1, 2, 3, 4].map((i) => (
+            {MobxStore.listsBlogs?.map((i) => (
               <BlogCard key={i} blog={blogData} />
             ))}
           </div>

@@ -43,13 +43,13 @@ export const Footer = () => {
 
       <div className="flex gap-2 mb-4">
         <Link
-          href="https://facebook.com/yourpage"
+          href="https://www.facebook.com/ILoveAnimeX"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Facebook />
         </Link>
-        <Link
+        {/* <Link
           href="https://twitter.com/yourpage"
           target="_blank"
           rel="noopener noreferrer"
@@ -62,7 +62,7 @@ export const Footer = () => {
           rel="noopener noreferrer"
         >
           <Youtube />
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
