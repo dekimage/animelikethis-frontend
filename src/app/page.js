@@ -99,7 +99,13 @@ const AllBlogsPage = observer(() => {
         {/* <Button onClick={async () => await MobxStore.addBlogsBulk(blogsGPT)}>
           Add blogs
         </Button>
-        <Button
+       
+       */}
+        {/* <Button onClick={() => MobxStore.updateDocuments()}>
+          Add Slugs to all blogs
+        </Button> */}
+
+        {/* <Button
           onClick={async () =>
             await MobxStore.findMissingMalIds().then((missingMalIds) => {
               console.log("Missing MAL IDs:", missingMalIds);
@@ -108,18 +114,28 @@ const AllBlogsPage = observer(() => {
         >
           Find missing MAL IDs
         </Button>
-       */}
-        {/* <Button onClick={() => MobxStore.updateDocuments()}>
-          Add Slugs to all blogs
-        </Button> */}
-
-        {/* <Button
+        <Button
           onClick={() =>
             MobxStore.fetchAndSaveAnimeDetails([
+              "39617",
+              "6573",
+              "37799",
+              "21881",
+              "20583",
+              "53356",
+              "53407",
+              "49458",
+              "52588",
+              "54900",
+              "55791",
+              "49785",
+              "55848",
+              "56063",
+              "56538",
               // "4139",
               // "41357",
-              "23390",
-              "28877",
+              // "23390",
+              // "28877",
             ])
           }
         >
