@@ -9,6 +9,9 @@ import { toJS } from "mobx";
 import { blogsGPT } from "./blogdata";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import logoImg from "../assets/animelogo.png";
+import { Input } from "@/components/ui/input";
+import AnimeSearchComponent from "@/components/customcomponents/Search";
 
 export const BlogCard = ({ blog }) => {
   const isList = blog.type == "list";
@@ -141,6 +144,8 @@ const AllBlogsPage = observer(() => {
         >
           Fetch and Save Anime Details
         </Button> */}
+
+        <AnimeSearchComponent />
 
         <h2 className="text-4xl font-bold mb-4 mt-8">Top Lists</h2>
         <div className="flex flex-wrap gap-4">

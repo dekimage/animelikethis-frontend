@@ -158,7 +158,8 @@ const AnimePage = async ({ params }) => {
     notFound();
   }
 
-  const { comparisons, name, animeDetails, anime, image } = blogData;
+  const { comparisons, name, animeDetails, anime, image, relatedBlog } =
+    blogData;
 
   const isList = blogData?.type === "list";
 
@@ -254,6 +255,34 @@ const AnimePage = async ({ params }) => {
         {/* <div>
         <Button onClick={() => MobxStore.fetchAnime(2904)}>FETCH API</Button>
       </div> */}
+        {relatedBlog && (
+          <section className="mt-24 flex justify-center w-full">
+            <Link href={`/${relatedBlog.slug}`}>
+              <div className="w-full rounded-lg flex sm:w-[650px] bg-gray-200 p-4 gap-4 cursor-pointer relative">
+                <div className="absolute top-[-18px] left-[20px] text-[20px] font-bold tracking-widest">
+                  RELATED
+                </div>
+                <div>
+                  <Image
+                    className="w-[500px]"
+                    src={relatedBlog.image}
+                    alt={name}
+                    height={150}
+                    width={250}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <div className="hover:underline text-2xl font-bold">
+                    {relatedBlog.title}
+                  </div>
+                  <div>
+                    {relatedBlog.description || relatedBlog.comparisonContent}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </section>
+        )}
 
         <section className="mt-24 flex justify-center">
           <div className="w-full sm:w-[650px]">

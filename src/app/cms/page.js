@@ -9,12 +9,14 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronUp,
+  FileWarning,
   ShieldAlert,
   Trash,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Combobox } from "@/reusable-ui/ComboBox";
 
 const Comparison = observer(
   ({ comparison, index, handleComparisonChange, handleRemoveComparison }) => {
@@ -146,7 +148,6 @@ const CMSView = observer(() => {
   };
 
   const handleTypeToggle = () => {
-    console.log("newType");
     const newType =
       MobxStore.blog.type === "comparisons" ? "list" : "comparisons";
     MobxStore.updateBlogField("type", newType);
@@ -233,6 +234,28 @@ const CMSView = observer(() => {
             )}
           </>
 
+          <div>
+            <label className="block text-foreground">Related Blog</label>
+            <Combobox
+              value={formData.related}
+              setValue={(value) => {
+                const find = MobxStore.blogs
+                  .filter((b) => b.type == "list")
+                  .filter((b) => {
+                    return b.id.toLowerCase() == value;
+                  });
+
+                MobxStore.updateBlogField("related", find[0].id);
+              }}
+              searchLabel={"Search Blog"}
+              options={MobxStore.blogs
+                .filter((b) => b.type == "list")
+                .map((blog) => {
+                  return { label: blog.title, value: blog.id };
+                })}
+            />
+          </div>
+
           <div className="mb-4">
             {formData.image && (
               <Image src={formData.image} width={250} height={250} alt="img" />
@@ -304,6 +327,7 @@ const CMSView = observer(() => {
                       <div className="text-2xl font-bold">
                         {blog.title || blog.anime}
                       </div>
+                      <p className="font-bold text-sm">ID: {blog.id}</p>
                       <p className="font-bold text-sm">MAL ID: {blog.malId}</p>
                       <div className="font-bold text-sm flex gap-2 items-center">
                         Comparisons: {blog.comparisons?.length} / 5{" "}
@@ -343,6 +367,14 @@ const CMSView = observer(() => {
                       <div className="text-2xl font-bold">
                         {blog.title || blog.anime}
                       </div>
+                      <p className="font-bold text-sm">
+                        Related:{" "}
+                        {
+                          MobxStore.blogs.filter((b) => b.id == blog.related)[0]
+                            ?.title
+                        }{" "}
+                        {/* {blog.related}  */}- {!blog.related ? "❌" : "✅"}
+                      </p>
                       <p className="font-bold text-sm">MAL ID: {blog.malId}</p>
                       <div className="font-bold text-sm flex gap-2 items-center">
                         Comparisons: {blog.comparisons?.length} / 5{" "}

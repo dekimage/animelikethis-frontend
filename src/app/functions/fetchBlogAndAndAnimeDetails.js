@@ -95,6 +95,33 @@ export async function fetchBlogAndAnimeDetails(slug) {
     }
 
     // console.log("Final blog data with anime details:", blogData);
+
+    if (blogData.related) {
+      try {
+        const relatedBlogRef = doc(db, "blogs", blogData.related);
+        const relatedBlogDoc = await getDoc(relatedBlogRef);
+
+        if (relatedBlogDoc.exists()) {
+          const relatedBlogData = relatedBlogDoc.data();
+          blogData.relatedBlog = {
+            slug: relatedBlogData.slug,
+            image: relatedBlogData.image,
+            title: relatedBlogData.title,
+            description: relatedBlogData.description,
+            comparisonContent:
+              relatedBlogData.comparisons && relatedBlogData.comparisons[0]
+                ? relatedBlogData.comparisons[0].content.slice(0, 150)
+                : "",
+          };
+        }
+      } catch (relatedBlogError) {
+        console.error(
+          "Error fetching related blog document:",
+          relatedBlogError
+        );
+      }
+    }
+
     return blogData;
   } catch (error) {
     console.error("Error fetching blog and anime details:", error);

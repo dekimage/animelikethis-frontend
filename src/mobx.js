@@ -330,7 +330,7 @@ class Store {
         this.blogsListLoading = false;
       });
 
-      console.log("Fetched blogs:", this.listsBlogs);
+      // console.log("Fetched blogs:", this.listsBlogs);
     } catch (error) {
       runInAction(() => {
         this.blogsListLoading = false;
