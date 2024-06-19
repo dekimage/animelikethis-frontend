@@ -104,6 +104,9 @@ const CMSView = observer(() => {
   const [formData, setFormData] = useState(MobxStore.blog);
   const [file, setFile] = useState(null);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminInput, setAdminInput] = useState("");
+
   useEffect(() => {
     MobxStore.fetchBlogs();
   }, []);
@@ -169,6 +172,21 @@ const CMSView = observer(() => {
   };
 
   const isBlogTypeList = MobxStore.blog.type === "list";
+
+  if (!isAdmin) {
+    return (
+      <div>
+        <Input
+          value={adminInput}
+          type="text"
+          onChange={(e) => setAdminInput(e.target.value)}
+        />
+        <Button onClick={() => setIsAdmin(adminInput === "pacipaci")}>
+          Work In Progress
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
