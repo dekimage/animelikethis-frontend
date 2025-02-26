@@ -15,7 +15,7 @@ const ReusableLayout = ({ children }) => {
       <div className="hidden sm:block">
         <ResizablePanelGroup
           direction="horizontal"
-          className="h-full max-h-[950px] items-stretch"
+          className="h-full  items-stretch"
         >
           <ResizablePanel
             className="border-l border-gray-[#e5e7eb]"
